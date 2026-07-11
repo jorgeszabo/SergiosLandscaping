@@ -27,7 +27,7 @@ import type {
   User,
 } from "./types";
 import { freshDatabase } from "./seed";
-import { demoCustomers, demoInspections, DEMO_PREFIX } from "./demo";
+import { demoCustomers, demoInspections } from "./demo";
 import { idbLoad, idbSave, idbReset } from "./local-db";
 import {
   serverConfigured,
@@ -76,8 +76,11 @@ interface StoreValue {
   deleteCustomer: (id: string) => Promise<void>;
   saveUser: (user: User, password?: string) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
-  loadDemo: () => void;
-  clearDemo: () => void;
+  /** Training mode: an isolated sandbox seeded with sample data. While on,
+      nothing is written to the real database (server or device) and the real
+      data is hidden; turning it off restores the real data untouched. */
+  training: boolean;
+  setTraining: (on: boolean) => void;
   resetLocal: () => Promise<void>;
 }
 
@@ -107,15 +110,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
   const [loginUsers, setLoginUsers] = useState<User[]>([]);
   const [pendingDraft, setPendingDraft] = useState<Inspection | null>(null);
+  const [training, setTrainingState] = useState(false);
   const dbRef = useRef(db);
   dbRef.current = db;
   const pendingRef = useRef(pendingDraft);
   pendingRef.current = pendingDraft;
+  // While training, mutations stay in memory only. A ref so callbacks always
+  // read the current value without being re-created.
+  const trainingRef = useRef(training);
+  trainingRef.current = training;
+  // The real database, stashed while training so it can be restored intact.
+  const realSnapshot = useRef<Database | null>(null);
 
   const commit = useCallback((next: Database) => {
     dbRef.current = next;
     setDb(next);
-    void idbSave(next);
+    // Training-mode changes never touch the on-device store.
+    if (!trainingRef.current) void idbSave(next);
   }, []);
 
   // ── boot ──────────────────────────────────────────────────────────────────
@@ -325,7 +336,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         : [stamped, ...dbRef.current.inspections];
       commit({ ...dbRef.current, inspections });
 
-      if (mode === "server" && navigator.onLine) {
+      if (mode === "server" && navigator.onLine && !trainingRef.current) {
         setSyncState("pending");
         pushInspection(stamped)
           .then(() => {
@@ -354,7 +365,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         ...dbRef.current,
         inspections: dbRef.current.inspections.filter((i) => i.id !== id),
       });
-      if (mode === "server" && navigator.onLine) await deleteInspectionApi(id);
+      if (mode === "server" && navigator.onLine && !trainingRef.current) await deleteInspectionApi(id);
     },
     [mode, commit]
   );
@@ -362,7 +373,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const saveCatalog = useCallback(
     async (catalog: Catalog) => {
       commit({ ...dbRef.current, catalog });
-      if (mode === "server") await pushCatalog(catalog);
+      if (mode === "server" && !trainingRef.current) await pushCatalog(catalog);
     },
     [mode, commit]
   );
@@ -370,7 +381,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const addCustomer = useCallback(
     (c: Customer) => {
       commit({ ...dbRef.current, customers: [c, ...dbRef.current.customers] });
-      if (mode === "server" && navigator.onLine) void pushCustomer(c).catch(() => {});
+      if (mode === "server" && navigator.onLine && !trainingRef.current) void pushCustomer(c).catch(() => {});
     },
     [mode, commit]
   );
@@ -381,7 +392,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         ...dbRef.current,
         customers: dbRef.current.customers.filter((c) => c.id !== id),
       });
-      if (mode === "server" && navigator.onLine) await deleteCustomerApi(id);
+      if (mode === "server" && navigator.onLine && !trainingRef.current) await deleteCustomerApi(id);
     },
     [mode, commit]
   );
@@ -394,7 +405,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         : [...dbRef.current.users, user];
       commit({ ...dbRef.current, users });
       setLoginUsers(users);
-      if (mode === "server") await saveUserApi(user, password);
+      if (mode === "server" && !trainingRef.current) await saveUserApi(user, password);
     },
     [mode, commit]
   );
@@ -404,31 +415,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const users = dbRef.current.users.filter((u) => u.id !== id);
       commit({ ...dbRef.current, users });
       setLoginUsers(users);
-      if (mode === "server") await deleteUserApi(id);
+      if (mode === "server" && !trainingRef.current) await deleteUserApi(id);
     },
     [mode, commit]
   );
 
-  const loadDemo = useCallback(() => {
-    const custs = demoCustomers();
-    const insps = demoInspections(Date.now());
-    const haveC = new Set(dbRef.current.customers.map((c) => c.id));
-    const haveI = new Set(dbRef.current.inspections.map((i) => i.id));
-    commit({
-      ...dbRef.current,
-      customers: [...custs.filter((c) => !haveC.has(c.id)), ...dbRef.current.customers],
-      // demo records are local-only (synced:true so the sync flush leaves them alone)
-      inspections: [...insps.filter((i) => !haveI.has(i.id)), ...dbRef.current.inspections],
-    });
-  }, [commit]);
-
-  const clearDemo = useCallback(() => {
-    commit({
-      ...dbRef.current,
-      customers: dbRef.current.customers.filter((c) => !c.id.startsWith(DEMO_PREFIX)),
-      inspections: dbRef.current.inspections.filter((i) => !i.id.startsWith(DEMO_PREFIX)),
-    });
-  }, [commit]);
+  // Enter/leave the isolated training sandbox. On enter, stash the real db and
+  // swap in a sample dataset (real users + catalog so login/pricing still work,
+  // demo customers + inspections to play with). On leave, restore the real db.
+  const setTraining = useCallback((on: boolean) => {
+    if (on === trainingRef.current) return;
+    if (on) {
+      realSnapshot.current = dbRef.current;
+      trainingRef.current = true;
+      setTrainingState(true);
+      const demo: Database = {
+        ...dbRef.current,
+        customers: demoCustomers(),
+        inspections: demoInspections(Date.now()),
+        session: dbRef.current.session,
+      };
+      dbRef.current = demo;
+      setDb(demo);
+      setPendingDraft(null);
+    } else {
+      const real = realSnapshot.current || freshDatabase();
+      trainingRef.current = false;
+      setTrainingState(false);
+      realSnapshot.current = null;
+      dbRef.current = real;
+      setDb(real);
+      setPendingDraft(null);
+    }
+  }, []);
 
   const resetLocal = useCallback(async () => {
     await idbReset();
@@ -463,8 +482,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     deleteCustomer,
     saveUser,
     deleteUser,
-    loadDemo,
-    clearDemo,
+    training,
+    setTraining,
     resetLocal,
   };
 

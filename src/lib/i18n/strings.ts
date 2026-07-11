@@ -238,6 +238,11 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     demoLoaded: "Demo data loaded",
     demoCleared: "Demo data cleared",
     demoHint: "Sample customers and inspections at each stage. Safe to load and clear anytime.",
+    // training / demo mode
+    trainingMode: "Training mode",
+    trainingModeHint: "Practice with sample data. Nothing you do here touches real records — turn it off to return to your real data.",
+    trainingBanner: "Training mode — sample data, not saved",
+    exitTraining: "Exit training",
     // customer management
     customersHdr: "Customers",
     navCustomers: "Customers",
@@ -534,6 +539,11 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     demoLoaded: "Datos de ejemplo cargados",
     demoCleared: "Datos de ejemplo borrados",
     demoHint: "Clientes e inspecciones de ejemplo en cada etapa. Puedes cargarlos y borrarlos cuando quieras.",
+    // training / demo mode
+    trainingMode: "Modo de entrenamiento",
+    trainingModeHint: "Practica con datos de ejemplo. Nada de lo que hagas aquí afecta los registros reales — desactívalo para volver a tus datos reales.",
+    trainingBanner: "Modo de entrenamiento — datos de ejemplo, no se guardan",
+    exitTraining: "Salir del entrenamiento",
     // customer management
     customersHdr: "Clientes",
     navCustomers: "Clientes",
