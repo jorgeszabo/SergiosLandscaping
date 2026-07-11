@@ -87,9 +87,12 @@ function Shell() {
 
 function Screen() {
   const { view } = useNav();
+  const { user } = useStore();
+  const isOffice = user?.role === "office" || user?.role === "admin";
   switch (view.name) {
     case "home":
-      return <Home />;
+      // Office/admin land on the queue; field techs get the mobile home list.
+      return isOffice ? <Office /> : <Home />;
     case "newJob":
       return <NewJob />;
     case "snapshot":

@@ -135,12 +135,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       } else {
         setMode("local");
         setLoginUsers(local.users);
-        // Restore a previous local session if present.
-        if (local.session) {
-          const u = local.users.find((x) => x.id === local.session) || null;
-          setUser(u);
-          if (u) setLangState(u.lang);
-        }
+        // In local/demo mode always start at the login screen (don't
+        // auto-restore a prior session) so the branded entry point is shown.
         setSyncState("local");
       }
 
