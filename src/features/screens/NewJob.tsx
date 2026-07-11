@@ -42,13 +42,16 @@ export function NewJob() {
   const places = useRef<any>(null);
   const token = useRef<any>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const seqRef = useRef(0); // invalidates out-of-order / superseded autocomplete responses
+  const mountedRef = useRef(true);
 
   // Device location → address.
   const [locating, setLocating] = useState(false);
   const [locMsg, setLocMsg] = useState("");
 
   useEffect(() => {
-    if (!mapsConfigured()) return;
+    mountedRef.current = true;
+    if (!mapsConfigured()) return () => { mountedRef.current = false; };
     let cancelled = false;
     loadMaps()
       .then(async (maps) => {
@@ -60,6 +63,7 @@ export function NewJob() {
       .catch(() => {});
     return () => {
       cancelled = true;
+      mountedRef.current = false;
       if (debounce.current) clearTimeout(debounce.current);
     };
   }, []);
@@ -93,10 +97,13 @@ export function NewJob() {
       setSugs([]);
       return;
     }
+    const seq = ++seqRef.current;
     const req: any = { input };
     if (token.current) req.sessionToken = token.current;
     lib.AutocompleteSuggestion.fetchAutocompleteSuggestions(req)
       .then((res: any) => {
+        // Ignore stale (out-of-order / superseded) responses and unmounts.
+        if (seq !== seqRef.current || !mountedRef.current) return;
         const list: AddrSug[] = (res?.suggestions || [])
           .map((s: any) => s.placePrediction)
           .filter(Boolean)
@@ -109,7 +116,7 @@ export function NewJob() {
         setSugs(list);
         setAddrOpen(list.length > 0);
       })
-      .catch(() => setSugs([]));
+      .catch(() => { if (seq === seqRef.current) setSugs([]); });
   };
 
   const onAddressInput = (v: string) => {
@@ -136,13 +143,18 @@ export function NewJob() {
   };
 
   const chooseAddr = async (s: AddrSug) => {
+    // Cancel any pending/in-flight suggestion fetch so it can't reopen the drop.
+    if (debounce.current) clearTimeout(debounce.current);
+    seqRef.current++;
     setAddrOpen(false);
     try {
       const place = s.pred.toPlace();
       await place.fetchFields({ fields: ["formattedAddress", "addressComponents", "location"] });
+      if (!mountedRef.current) return;
       const loc = place.location ? { lat: place.location.lat(), lng: place.location.lng() } : null;
       applyComponents(place.addressComponents || [], place.formattedAddress || "", loc, s.primary);
     } catch {
+      if (!mountedRef.current) return;
       setAddress(s.primary);
       setCity(s.secondary);
     }
@@ -165,6 +177,7 @@ export function NewJob() {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
+        if (!mountedRef.current) return; // navigated away during the GPS fix
         const { latitude: lat, longitude: lng } = pos.coords;
         setGeo({ lat, lng });
         try {
@@ -173,6 +186,7 @@ export function NewJob() {
           const Geocoder = geoLib.Geocoder || maps.Geocoder;
           const geocoder = new Geocoder();
           const { results } = await geocoder.geocode({ location: { lat, lng } });
+          if (!mountedRef.current) return;
           const best = results?.[0];
           if (best) {
             applyComponents(best.address_components || [], best.formatted_address || "", { lat, lng });
@@ -180,12 +194,13 @@ export function NewJob() {
             setLocMsg(t("geocodeFailed"));
           }
         } catch {
-          setLocMsg(t("geocodeFailed"));
+          if (mountedRef.current) setLocMsg(t("geocodeFailed"));
         } finally {
-          setLocating(false);
+          if (mountedRef.current) setLocating(false);
         }
       },
       (err) => {
+        if (!mountedRef.current) return;
         setLocating(false);
         setLocMsg(err.code === err.PERMISSION_DENIED ? t("locationDenied") : t("locationOff"));
       },

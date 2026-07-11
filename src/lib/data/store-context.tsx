@@ -121,6 +121,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   trainingRef.current = training;
   // The real database, stashed while training so it can be restored intact.
   const realSnapshot = useRef<Database | null>(null);
+  // Guards against overlapping reconnect-flush loops.
+  const flushingRef = useRef(false);
 
   const commit = useCallback((next: Database) => {
     dbRef.current = next;
@@ -215,30 +217,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // Flush unsynced inspections when we regain connectivity (server mode).
   useEffect(() => {
-    if (mode !== "server" || !online || !user) return;
+    // Never flush while training (sandbox writes must not reach the server),
+    // and never run two flush loops at once.
+    if (mode !== "server" || !online || !user || trainingRef.current) return;
+    if (flushingRef.current) return;
     const pending = dbRef.current.inspections.filter((i) => i.synced === false);
     if (!pending.length) return;
+    flushingRef.current = true;
     (async () => {
-      let ok = true;
-      const conflicts: string[] = [];
-      for (const insp of pending) {
-        try {
-          await pushInspection(insp);
-        } catch (e) {
-          ok = false;
-          if (e instanceof ConflictError) conflicts.push(insp.id);
+      try {
+        const startedAt = new Map(pending.map((i) => [i.id, i.updatedAt]));
+        const pushedOk: string[] = [];
+        const conflicts: string[] = [];
+        for (const insp of pending) {
+          try {
+            await pushInspection(insp);
+            pushedOk.push(insp.id);
+          } catch (e) {
+            if (e instanceof ConflictError) conflicts.push(insp.id);
+          }
         }
-      }
-      if (conflicts.length) {
-        await reconcileFromServer(conflicts);
-      } else if (ok) {
-        commit({
-          ...dbRef.current,
-          inspections: dbRef.current.inspections.map((i) =>
-            i.synced === false ? { ...i, synced: true } : i
-          ),
-        });
-        setSyncState("synced");
+        // Mark synced ONLY the records that pushed this round and haven't been
+        // edited again since (updatedAt unchanged) — so a concurrent edit isn't
+        // silently treated as synced, and partial success is persisted.
+        if (pushedOk.length) {
+          const ok = new Set(pushedOk);
+          commit({
+            ...dbRef.current,
+            inspections: dbRef.current.inspections.map((i) =>
+              ok.has(i.id) && i.updatedAt === startedAt.get(i.id) ? { ...i, synced: true } : i
+            ),
+          });
+        }
+        if (conflicts.length) await reconcileFromServer(conflicts);
+        setSyncState(conflicts.length ? "pending" : "synced");
+      } finally {
+        flushingRef.current = false;
       }
     })();
   }, [online, mode, user, commit, reconcileFromServer]);
@@ -340,10 +354,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSyncState("pending");
         pushInspection(stamped)
           .then(() => {
+            // Only clear the unsynced flag if this exact version is still the
+            // current one — a newer in-flight edit must stay unsynced.
             const next = {
               ...dbRef.current,
               inspections: dbRef.current.inspections.map((i) =>
-                i.id === stamped.id ? { ...i, synced: true } : i
+                i.id === stamped.id && i.updatedAt === stamped.updatedAt ? { ...i, synced: true } : i
               ),
             };
             commit(next);

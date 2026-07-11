@@ -76,6 +76,7 @@ export async function getCatalog(): Promise<Catalog> {
   await ensureInitialized();
   const sql = getSql();
   const rows = await sql`SELECT data FROM catalog WHERE id = 'default' LIMIT 1`;
+  if (!rows.length) throw new Error("catalog not initialized");
   return rows[0].data as Catalog;
 }
 
@@ -112,7 +113,8 @@ export async function addCustomer(c: Customer): Promise<void> {
             ${c.externalId ?? null}, ${c.externalSource ?? null})
     ON CONFLICT (id) DO UPDATE SET
       name = EXCLUDED.name, address = EXCLUDED.address, city = EXCLUDED.city,
-      contact = EXCLUDED.contact`;
+      contact = EXCLUDED.contact,
+      external_id = EXCLUDED.external_id, external_source = EXCLUDED.external_source`;
 }
 
 export async function deleteCustomer(id: string): Promise<void> {
@@ -148,7 +150,9 @@ export async function upsertInspection(insp: Inspection): Promise<boolean> {
   await ensureInitialized();
   const sql = getSql();
   const clean: Inspection = { ...insp, synced: true };
-  const updatedAt = insp.updatedAt || Date.now();
+  // Use the caller's timestamp verbatim; a missing one loses the <= comparison
+  // (treated as 0) so it can't clobber a newer stored row.
+  const updatedAt = typeof insp.updatedAt === "number" ? insp.updatedAt : 0;
   const result = await sql`
     INSERT INTO inspections (id, status, tech, updated_at, data)
     VALUES (${insp.id}, ${insp.status}, ${insp.tech}, ${updatedAt},

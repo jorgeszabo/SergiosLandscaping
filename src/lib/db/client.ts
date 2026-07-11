@@ -32,10 +32,11 @@ export function databaseUrl(): string | undefined {
     if (isPgUrl(val)) found.push({ key, val });
   }
   if (found.length === 0) return undefined;
-  const pooled = found.find(
-    (f) => !/UNPOOLED|NON_POOLING/i.test(f.key) && /(_|^)(DATABASE|POSTGRES)_URL$|(_|^)URL$/i.test(f.key)
-  );
-  return (pooled || found[0]).val;
+  // Prefer a conventionally-named pooled URL; otherwise any non-direct URL;
+  // fall back to whatever we found last.
+  const notDirect = found.filter((f) => !/UNPOOLED|NON_POOLING|DIRECT/i.test(f.key));
+  const pooled = notDirect.find((f) => /(_|^)(DATABASE|POSTGRES)_URL$|(_|^)URL$/i.test(f.key));
+  return (pooled || notDirect[0] || found[0]).val;
 }
 
 export function isDbConfigured(): boolean {

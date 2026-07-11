@@ -9,6 +9,7 @@
    so the server mirrors the exact client object model without a brittle ORM
    mapping. All of it stays Admin-editable.
    --------------------------------------------------------------------------- */
+import type { Sql } from "postgres";
 import { getSql } from "./client";
 import { hashPassword } from "@/lib/auth/password";
 import { SEED_CATALOG, SEED_USERS, SEED_CUSTOMERS } from "@/lib/data/seed";
@@ -18,8 +19,7 @@ export const DEFAULT_PASSWORD = "sergios2026";
 
 let _initialized: Promise<void> | null = null;
 
-async function createSchema(): Promise<void> {
-  const sql = getSql();
+async function createSchema(sql: Sql): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id text PRIMARY KEY,
@@ -55,9 +55,7 @@ async function createSchema(): Promise<void> {
     )`;
 }
 
-async function seedIfEmpty(): Promise<void> {
-  const sql = getSql();
-
+async function seedIfEmpty(sql: Sql): Promise<void> {
   const [{ count: userCount }] = await sql<{ count: number }[]>`
     SELECT count(*)::int AS count FROM users`;
   if (userCount === 0) {
@@ -97,8 +95,14 @@ async function seedIfEmpty(): Promise<void> {
 export function ensureInitialized(): Promise<void> {
   if (!_initialized) {
     _initialized = (async () => {
-      await createSchema();
-      await seedIfEmpty();
+      const root = getSql();
+      // Serialize concurrent cold-start initializers with a transaction-scoped
+      // advisory lock so parallel CREATE TABLE / seed can't collide.
+      await root.begin(async (tx) => {
+        await tx`SELECT pg_advisory_xact_lock(748219347)`;
+        await createSchema(tx as unknown as Sql);
+        await seedIfEmpty(tx as unknown as Sql);
+      });
     })().catch((e) => {
       _initialized = null; // allow retry on the next request
       throw e;
