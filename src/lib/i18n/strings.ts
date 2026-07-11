@@ -232,13 +232,6 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     viewAll: "View all",
     needsAttention: "Needs your attention",
     nothingHere: "Nothing here yet.",
-    // demo data
-    demoData: "Demo data",
-    loadDemo: "Load demo data",
-    clearDemo: "Clear demo data",
-    demoLoaded: "Demo data loaded",
-    demoCleared: "Demo data cleared",
-    demoHint: "Sample customers and inspections at each stage. Safe to load and clear anytime.",
     // training / demo mode
     trainingMode: "Training mode",
     trainingModeHint: "Practice with sample data. Nothing you do here touches real records — turn it off to return to your real data.",
@@ -270,7 +263,6 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     confirmRemoveLine: "Remove this line from the quote?",
     confirmClearMap: "Remove every shape and pin from the map?",
     confirmDeleteUser: "Remove this user?",
-    confirmClearDemo: "Remove all demo data?",
     // location
     useMyLocation: "Use my location",
     locating: "Locating…",
@@ -534,13 +526,6 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     viewAll: "Ver todo",
     needsAttention: "Requiere tu atención",
     nothingHere: "Aún no hay nada aquí.",
-    // demo data
-    demoData: "Datos de ejemplo",
-    loadDemo: "Cargar datos de ejemplo",
-    clearDemo: "Borrar datos de ejemplo",
-    demoLoaded: "Datos de ejemplo cargados",
-    demoCleared: "Datos de ejemplo borrados",
-    demoHint: "Clientes e inspecciones de ejemplo en cada etapa. Puedes cargarlos y borrarlos cuando quieras.",
     // training / demo mode
     trainingMode: "Modo de entrenamiento",
     trainingModeHint: "Practica con datos de ejemplo. Nada de lo que hagas aquí afecta los registros reales — desactívalo para volver a tus datos reales.",
@@ -572,7 +557,6 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     confirmRemoveLine: "¿Quitar esta línea de la cotización?",
     confirmClearMap: "¿Quitar todas las formas y pines del mapa?",
     confirmDeleteUser: "¿Eliminar este usuario?",
-    confirmClearDemo: "¿Eliminar todos los datos de ejemplo?",
     // location
     useMyLocation: "Usar mi ubicación",
     locating: "Ubicando…",

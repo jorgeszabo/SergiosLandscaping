@@ -1,11 +1,12 @@
 /* ---------------------------------------------------------------------------
    Demo / test data — realistic customers and inspections at each stage of the
-   lifecycle. All records use the "demo-" id prefix so an admin can load and
-   clear them cleanly from the app. Safe to run repeatedly.
+   lifecycle. Used by Training mode, which swaps this whole in-memory dataset in
+   (nothing is written to the server or device). Ids carry a "demo-" prefix to
+   keep them clearly distinct. Pure/repeatable.
    --------------------------------------------------------------------------- */
 import type { Customer, Inspection, Line, Zone } from "./types";
 
-export const DEMO_PREFIX = "demo-";
+const DEMO_PREFIX = "demo-";
 
 let seq = 0;
 const lid = () => `${DEMO_PREFIX}l${++seq}`;

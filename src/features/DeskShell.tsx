@@ -5,8 +5,7 @@ import { useNav, type ViewName } from "./nav";
 import { screenTitle } from "./titles";
 import { HelpButton } from "./help";
 import { ThemePicker } from "./ThemePicker";
-import { uid } from "@/lib/data/id";
-import type { Inspection } from "@/lib/data/types";
+import { newInspectionDraft } from "@/lib/data/factory";
 import {
   IconHome, IconInbox, IconGrid, IconUsers, IconBook, IconPlus, IconGlobe, IconLogout, IconBriefcase,
 } from "@/components/icons";
@@ -31,13 +30,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
   ];
 
   const startNew = () => {
-    const insp: Inspection = {
-      id: uid(), customer: "", address: "", city: "",
-      tech: user.name, techId: user.id,
-      date: new Date().toISOString().slice(0, 10), status: "draft",
-      snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
-      zones: [], lines: [],
-    };
+    const insp = newInspectionDraft(user);
     beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };

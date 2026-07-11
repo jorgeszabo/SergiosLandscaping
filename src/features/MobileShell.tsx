@@ -7,8 +7,7 @@ import { screenTitle } from "./titles";
 import { HelpButton } from "./help";
 import { ThemePicker } from "./ThemePicker";
 import { Sheet } from "@/components/Sheet";
-import { uid } from "@/lib/data/id";
-import type { Inspection } from "@/lib/data/types";
+import { newInspectionDraft } from "@/lib/data/factory";
 import {
   IconHome, IconInbox, IconGrid, IconUsers, IconPlus, IconMenu, IconGlobe,
   IconLogout, IconBook, IconBriefcase,
@@ -25,13 +24,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
   const isAdmin = !!user.permissions.editCatalog;
 
   const startNew = () => {
-    const insp: Inspection = {
-      id: uid(), customer: "", address: "", city: "",
-      tech: user.name, techId: user.id,
-      date: new Date().toISOString().slice(0, 10), status: "draft",
-      snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
-      zones: [], lines: [],
-    };
+    const insp = newInspectionDraft(user);
     beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };

@@ -4,16 +4,11 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
 import { useNav } from "../nav";
 import { inspectionTotals, money } from "@/lib/money/engine";
-import { uid } from "@/lib/data/id";
-import { IconChevronLeft, IconPlus, IconTrash, IconClipboard } from "@/components/icons";
-import type { Customer, Inspection, InspectionStatus } from "@/lib/data/types";
-
-const badgeTone = (s: InspectionStatus): string => {
-  if (s === "completed") return "done";
-  if (s === "approved" || s === "in_progress") return "navy";
-  if (s === "returned") return "red";
-  return "new";
-};
+import { newInspectionDraft } from "@/lib/data/factory";
+import { badgeTone } from "@/lib/data/status";
+import { ListAvatar } from "@/components/ListAvatar";
+import { IconChevronLeft, IconPlus, IconTrash } from "@/components/icons";
+import type { Customer } from "@/lib/data/types";
 
 /** A single customer: their site info, a button to start a new inspection
     there, and their full job history (past inspections / work orders) — so a
@@ -43,20 +38,12 @@ export function CustomerDetail() {
     .sort((a, b) => (b.date || "").localeCompare(a.date || "") || (b.updatedAt || 0) - (a.updatedAt || 0));
 
   const startHere = () => {
-    const insp: Inspection = {
-      id: uid(),
+    const insp = newInspectionDraft(user, {
       customer: c.name,
       address: c.address,
       city: c.city,
       customerId: c.id,
-      tech: user.name,
-      techId: user.id,
-      date: new Date().toISOString().slice(0, 10),
-      status: "draft",
-      snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
-      zones: [],
-      lines: [],
-    };
+    });
     beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
@@ -92,15 +79,7 @@ export function CustomerDetail() {
             const items = insp.lines.filter((l) => l.state === "on").length;
             return (
               <button key={insp.id} className="item" onClick={() => navigate({ name: "review", inspId: insp.id })}>
-                <span
-                  style={{
-                    width: 34, height: 34, borderRadius: 8, flex: "none",
-                    background: "var(--brand-primary-soft)", color: "var(--brand-primary)",
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  }}
-                >
-                  <IconClipboard size={18} />
-                </span>
+                <ListAvatar />
                 <div className="g">
                   <div className="n">{insp.date || "—"}</div>
                   <div className="m">
