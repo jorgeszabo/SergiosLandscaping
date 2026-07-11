@@ -26,6 +26,8 @@ export interface View {
   custId?: string;
   zn?: number | "system";
   tab?: string;
+  /** Which printable document the print screen renders. */
+  doc?: "report" | "estimate" | "workorder" | "completion";
 }
 
 interface Nav {

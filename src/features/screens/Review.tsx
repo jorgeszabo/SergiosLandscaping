@@ -323,14 +323,22 @@ export function Review() {
               </div>
             )}
 
-            {/* Always available */}
-            <button
-              className="btn block ghost noprint"
-              style={{ marginTop: 8 }}
-              onClick={() => navigate({ name: "print", inspId: insp.id })}
-            >
-              {t("printQuote")}
-            </button>
+            {/* Printable documents — contextual to the stage */}
+            <div className="noprint" style={{ marginTop: 12 }}>
+              <label className="f" style={{ marginTop: 0 }}>{t("proposal")}</label>
+              <div className="pillbar">
+                <button className="chip" onClick={() => navigate({ name: "print", inspId: insp.id, doc: "report" })}>{t("printReport")}</button>
+                {canSeePrice && (
+                  <button className="chip" onClick={() => navigate({ name: "print", inspId: insp.id, doc: "estimate" })}>{t("printEstimate")}</button>
+                )}
+                {(s === "approved" || s === "in_progress" || s === "completed") && (
+                  <button className="chip" onClick={() => navigate({ name: "print", inspId: insp.id, doc: "workorder" })}>{t("printWorkOrder")}</button>
+                )}
+                {s === "completed" && (
+                  <button className="chip" onClick={() => navigate({ name: "print", inspId: insp.id, doc: "completion" })}>{t("printCompletion")}</button>
+                )}
+              </div>
+            </div>
             {canApprove && (s === "approved" || s === "in_progress" || s === "completed") && (
               <button className="btn block noprint" style={{ marginTop: 8 }} onClick={exportWO}>
                 {t("export")}
