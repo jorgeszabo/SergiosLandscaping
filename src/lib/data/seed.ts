@@ -19,7 +19,7 @@ import type {
 // ── permission presets by role (§4) ─────────────────────────────────────────
 const ROLE_PERMS: Record<string, Permissions> = {
   field: { seePrices: false, setPrice: false, editCatalog: false, approve: false },
-  fieldPricer: { seePrices: true, setPrice: true, editCatalog: false, approve: false },
+  lead: { seePrices: true, setPrice: false, editCatalog: false, approve: false },
   office: { seePrices: true, setPrice: true, editCatalog: false, approve: false },
   admin: { seePrices: true, setPrice: true, editCatalog: true, approve: true },
 };
@@ -222,7 +222,7 @@ export const SEED_CATALOG: Catalog = {
 
 // ── users (roles + individual permission keys) ───────────────────────────────
 export const SEED_USERS: User[] = [
-  { id: "antonio", name: "Antonio", role: "field", lang: "es", permissions: ROLE_PERMS.fieldPricer },
+  { id: "antonio", name: "Antonio", role: "lead", lang: "es", permissions: ROLE_PERMS.lead },
   { id: "luis", name: "Luis", role: "field", lang: "es", permissions: ROLE_PERMS.field },
   { id: "maria", name: "María", role: "office", lang: "en", permissions: ROLE_PERMS.office },
   { id: "admin", name: "Admin", role: "admin", lang: "en", permissions: ROLE_PERMS.admin },

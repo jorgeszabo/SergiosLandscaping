@@ -163,3 +163,4 @@ seeding.
 - `docs/irrigation-parts-catalog-STARTER.xlsx` — the starter catalog
 - `docs/SELF_HOSTING.md` — moving off Vercel/Neon to a personal server
 - `docs/USER_GUIDE.md` — plain-language guide for the office and field crew
+  (Spanish: `docs/USER_GUIDE.es.md`)
