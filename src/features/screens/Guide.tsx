@@ -34,7 +34,7 @@ const GUIDE = {
     },
     {
       h: "Catalog",
-      p: "Admins edit parts, labor rates, assemblies, and issue types under Catalog. Search, tap an item, and edit its prices and bilingual names. The starter prices are placeholders — replace them with your real numbers.",
+      p: "Admins edit parts, labor rates, assemblies, and issue types under Catalog. Parts are grouped by component type. To add a part, pick its component type — the name fills in both English and Spanish automatically, so you never translate by hand; then enter brand, model, SKU, and price. 'Load starter items' pulls in the full starter list without touching your edits. Starter prices are placeholders — replace them with your real numbers.",
     },
     {
       h: "Offline & sync",
@@ -72,7 +72,7 @@ const GUIDE = {
     },
     {
       h: "Catálogo",
-      p: "Los admins editan piezas, mano de obra, ensambles y tipos de problema en Catálogo. Busca, toca un elemento y edita sus precios y nombres bilingües. Los precios iniciales son de ejemplo — reemplázalos con los tuyos.",
+      p: "Los admins editan piezas, mano de obra, ensambles y tipos de problema en Catálogo. Las piezas se agrupan por tipo de componente. Para agregar una pieza, elige su tipo de componente — el nombre se llena en inglés y español automáticamente, sin traducir a mano; luego captura marca, modelo, SKU y precio. “Cargar elementos iniciales” trae la lista completa sin tocar tus cambios. Los precios iniciales son de ejemplo — reemplázalos con los tuyos.",
     },
     {
       h: "Sin conexión y sincronización",

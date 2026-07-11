@@ -7,6 +7,7 @@ import { useNav } from "../nav";
 import { money, findPart, findLabor, nm as engineNm } from "@/lib/money/engine";
 import { uid } from "@/lib/data/id";
 import { SEED_CATALOG } from "@/lib/data/seed";
+import { PART_TYPES } from "@/lib/data/part-types";
 import { IconSearch, IconChevronRight, IconChevronLeft, IconPlus, IconTrash } from "@/components/icons";
 import type {
   Assembly, Catalog as CatalogT, IssueType, Lang, LaborRate, Part, Severity, Unit,
@@ -53,6 +54,9 @@ export function Catalog() {
   const [catFilter, setCatFilter] = useState<string>("all");
   const [edit, setEdit] = useState<EditItem | null>(null);
   const [isNew, setIsNew] = useState(false);
+  // For parts: whether the admin is typing a custom (off-dictionary) name
+  // instead of picking a predefined component type.
+  const [partCustom, setPartCustom] = useState(false);
   const catLabel = (cat: string) =>
     cat === "__unc" ? t("catUncategorized") : CATEGORY_LABELS[cat]?.[lang as Lang] ?? cat;
 
@@ -79,9 +83,15 @@ export function Catalog() {
   };
   const match = (s: string) => s.toLowerCase().includes(q.trim().toLowerCase());
 
-  const openEdit = (item: EditItem) => { setEdit(structuredClone(item)); setIsNew(false); };
+  const openEdit = (item: EditItem) => {
+    setEdit(structuredClone(item));
+    setIsNew(false);
+    // Off-dictionary existing part → start in custom-name mode.
+    setPartCustom(tab === "parts" && !!item.name.en && !PART_TYPES.some((pt) => pt.name.en === item.name.en));
+  };
   const openNew = () => {
     setIsNew(true);
+    setPartCustom(false);
     setEdit(tab === "parts" ? blankPart() : tab === "labor" ? blankLabor() : tab === "assemblies" ? blankAssembly() : blankIssue());
   };
   const close = () => setEdit(null);
@@ -120,10 +130,50 @@ export function Catalog() {
           <IconChevronLeft size={16} /> {t("back")}
         </button>
         <div className="card stack" style={{ marginTop: 8 }}>
-          <div className="grid2">
-            <Field label="English"><input className="t" value={edit.name.en} onChange={(e) => set({ name: { ...edit.name, en: e.target.value } })} /></Field>
-            <Field label="Español"><input className="t" value={edit.name.es} onChange={(e) => set({ name: { ...edit.name, es: e.target.value } })} /></Field>
-          </div>
+          {tab === "parts" ? (
+            <>
+              <Field label={t("componentType")}>
+                <select
+                  className="t"
+                  value={partCustom ? "__custom" : (PART_TYPES.find((pt) => pt.name.en === edit.name.en)?.id ?? "")}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "__custom") { setPartCustom(true); return; }
+                    setPartCustom(false);
+                    if (v === "") { set({ name: { en: "", es: "" } }); return; }
+                    const pt = PART_TYPES.find((x) => x.id === v);
+                    if (pt) set({ name: { ...pt.name }, category: pt.category, unit: pt.unit } as Partial<EditItem>);
+                  }}
+                >
+                  <option value="">{t("chooseType")}</option>
+                  {CATEGORY_ORDER.filter((c) => PART_TYPES.some((pt) => pt.category === c)).map((c) => (
+                    <optgroup key={c} label={catLabel(c)}>
+                      {PART_TYPES.filter((pt) => pt.category === c).map((pt) => (
+                        <option key={pt.id} value={pt.id}>{nm(pt.name)}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                  <option value="__custom">{t("customType")}</option>
+                </select>
+              </Field>
+              {partCustom ? (
+                <div className="grid2">
+                  <Field label="English"><input className="t" value={edit.name.en} onChange={(e) => set({ name: { ...edit.name, en: e.target.value } })} /></Field>
+                  <Field label="Español"><input className="t" value={edit.name.es} onChange={(e) => set({ name: { ...edit.name, es: e.target.value } })} /></Field>
+                </div>
+              ) : edit.name.en ? (
+                <div className="note">
+                  <b style={{ color: "var(--text-strong)" }}>{edit.name.en}</b> · {edit.name.es}
+                  <div style={{ marginTop: 2 }}>{t("typeFillsName")}</div>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="grid2">
+              <Field label="English"><input className="t" value={edit.name.en} onChange={(e) => set({ name: { ...edit.name, en: e.target.value } })} /></Field>
+              <Field label="Español"><input className="t" value={edit.name.es} onChange={(e) => set({ name: { ...edit.name, es: e.target.value } })} /></Field>
+            </div>
+          )}
 
           {tab === "parts" && <PartFields p={edit as Part} set={set} t={t} />}
           {tab === "labor" && <LaborFields l={edit as LaborRate} set={set} t={t} />}
