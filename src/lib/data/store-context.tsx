@@ -41,6 +41,7 @@ import {
   pushCustomer,
   saveUserApi,
   deleteUserApi,
+  deleteCustomerApi,
   ConflictError,
 } from "./api";
 
@@ -66,6 +67,7 @@ interface StoreValue {
   removeInspection: (id: string) => void;
   saveCatalog: (catalog: Catalog) => Promise<void>;
   addCustomer: (c: Customer) => void;
+  deleteCustomer: (id: string) => Promise<void>;
   saveUser: (user: User, password?: string) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
   loadDemo: () => void;
@@ -349,6 +351,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [mode, commit]
   );
 
+  const deleteCustomer = useCallback(
+    async (id: string) => {
+      commit({
+        ...dbRef.current,
+        customers: dbRef.current.customers.filter((c) => c.id !== id),
+      });
+      if (mode === "server" && navigator.onLine) await deleteCustomerApi(id);
+    },
+    [mode, commit]
+  );
+
   const saveUser = useCallback(
     async (user: User, password?: string) => {
       const exists = dbRef.current.users.some((u) => u.id === user.id);
@@ -420,6 +433,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     removeInspection,
     saveCatalog,
     addCustomer,
+    deleteCustomer,
     saveUser,
     deleteUser,
     loadDemo,

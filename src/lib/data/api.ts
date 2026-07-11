@@ -122,3 +122,9 @@ export async function pushCustomer(customer: Customer): Promise<void> {
     if (!r.ok) throw new Error("push customer failed");
   });
 }
+
+export async function deleteCustomerApi(id: string): Promise<void> {
+  await fetch(`/api/customers/${encodeURIComponent(id)}`, { method: "DELETE" }).then((r) => {
+    if (!r.ok) throw new Error("delete customer failed");
+  });
+}
