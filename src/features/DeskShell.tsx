@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useNav, type ViewName } from "./nav";
 import { screenTitle } from "./titles";
 import { HelpButton } from "./help";
+import { ThemePicker } from "./ThemePicker";
 import { uid } from "@/lib/data/id";
 import type { Inspection } from "@/lib/data/types";
 import {
@@ -85,6 +86,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
         <header className="topbar noprint">
           <h1>{screenTitle(view.name, t, true)}</h1>
           <div className="row" style={{ gap: 6 }}>
+            <ThemePicker compact />
             <HelpButton view={view.name} />
             <button
               className="chip"

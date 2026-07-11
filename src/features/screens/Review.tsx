@@ -146,6 +146,27 @@ export function Review() {
       {group("deferred", t("deferredH"))}
       {group("declined", t("declinedH"))}
 
+      {(() => {
+        const shots = insp.lines.flatMap((l) => {
+          const ps = [...(l.photos || []), ...(l.photo ? [l.photo] : [])];
+          return ps.map((src) => ({ src, name: lineName(l, catalog, lang) }));
+        });
+        if (!shots.length) return null;
+        return (
+          <>
+            <h2>{t("photo")}</h2>
+            <div className="card">
+              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                {shots.map((s, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={i} className="thumb" src={s.src} alt={s.name} title={s.name} style={{ width: 74, height: 74 }} />
+                ))}
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
       {canSeePrice && (
         <div className="card" style={{ marginTop: 14 }}>
           {(isOffice || canApprove) && (

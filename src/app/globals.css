@@ -62,6 +62,34 @@
   --ease:cubic-bezier(.2,0,0,1);
 }
 
+/* ---- Dark theme ---- */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-page:#191813; --surface-card:#211F19; --surface-raised:#2A2721; --surface-sunken:#131209; --surface-inverse:var(--neutral-50);
+  --text-strong:#F4F1EA; --text-body:#D3CDC1; --text-muted:#9A9384; --text-inverse:var(--neutral-900); --text-on-primary:var(--neutral-0);
+  --text-link:var(--navy-300); --text-link-hover:var(--navy-200);
+  --border-subtle:#322E27; --border-default:#3D392F; --border-strong:#4E4839;
+  --brand-primary:#3E6EA0; --brand-primary-hover:#4E82B8; --brand-primary-active:#6098CC; --brand-primary-soft:#1C2B3A;
+  --brand-accent:var(--red-400); --brand-accent-hover:#E4615F; --brand-accent-soft:#35211F;
+  --brand-green:var(--green-400); --brand-green-hover:#82B885; --brand-green-soft:#1E2C1F;
+  --success:var(--green-400); --success-soft:#1E2C1F; --warning:var(--amber-500); --warning-soft:#33280F;
+  --danger:var(--red-400); --danger-soft:#35211F; --info:var(--navy-400); --info-soft:#1C2B3A;
+  --focus-ring:var(--navy-400);
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4); --shadow-sm:0 1px 3px rgba(0,0,0,.45); --shadow-md:0 4px 10px rgba(0,0,0,.5); --shadow-lg:0 12px 28px rgba(0,0,0,.55);
+}
+/* ---- Sunny theme — maximum contrast for outdoor / bright sun ---- */
+[data-theme="sunny"] {
+  color-scheme: light;
+  --surface-page:#ffffff; --surface-card:#ffffff; --surface-raised:#ffffff; --surface-sunken:#e7ebe6; --surface-inverse:#0F2438;
+  --text-strong:#000000; --text-body:#121619; --text-muted:#333a40;
+  --border-subtle:#8f988f; --border-default:#5f6962; --border-strong:#3b4147;
+  --brand-primary:#0F2438; --brand-primary-hover:#0a1a2a; --brand-primary-active:#06121e; --brand-primary-soft:#d3e1f0;
+  --brand-accent:#8A1D24; --brand-accent-hover:#6e161c; --brand-accent-soft:#f8dcda;
+  --brand-green:#2E5C3A; --brand-green-hover:#234a2d; --brand-green-soft:#dcebda;
+  --success:#2E5C3A; --success-soft:#dcebda; --warning:#7c5210; --warning-soft:#f7eacf; --danger:#8A1D24; --danger-soft:#f8dcda; --info:#244B72; --info-soft:#dee8f1;
+  --focus-ring:#000000;
+}
+
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {

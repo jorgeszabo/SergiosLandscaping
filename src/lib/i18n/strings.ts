@@ -239,6 +239,10 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     search: "Search",
     edit: "Edit",
     itemsCount: "items",
+    theme: "Display",
+    themeLight: "Light",
+    themeDark: "Dark",
+    themeSunny: "Sunny",
   },
   es: {
     appName: "Sergio's Landscaping",
@@ -471,5 +475,9 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     search: "Buscar",
     edit: "Editar",
     itemsCount: "elementos",
+    theme: "Pantalla",
+    themeLight: "Claro",
+    themeDark: "Oscuro",
+    themeSunny: "Sol",
   },
 };

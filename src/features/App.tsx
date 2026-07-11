@@ -30,7 +30,7 @@ export default function App() {
 }
 
 function Inner() {
-  const { lang, setLang } = useStore();
+  const { lang, setLang, theme } = useStore();
 
   // Register the offline app-shell service worker.
   useEffect(() => {
@@ -38,6 +38,11 @@ function Inner() {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
   }, []);
+
+  // Apply the chosen theme (light / dark / sunny).
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   return (
     <I18nProvider lang={lang} setLang={setLang}>

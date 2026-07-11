@@ -23,6 +23,7 @@ import type {
   Database,
   Inspection,
   Lang,
+  Theme,
   User,
 } from "./types";
 import { freshDatabase } from "./seed";
@@ -40,6 +41,7 @@ import {
   pushCustomer,
   saveUserApi,
   deleteUserApi,
+  ConflictError,
 } from "./api";
 
 export type SyncState = "local" | "synced" | "pending" | "offline";
@@ -55,6 +57,8 @@ interface StoreValue {
   /** Users offered on the login screen (server users in server mode). */
   loginUsers: User[];
   setLang: (l: Lang) => void;
+  theme: Theme;
+  setTheme: (th: Theme) => void;
   toggleRunningTotal: () => void;
   login: (userId: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -92,6 +96,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [db, setDb] = useState<Database>(() => freshDatabase());
   const [user, setUser] = useState<User | null>(null);
   const [lang, setLangState] = useState<Lang>("es");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [loginUsers, setLoginUsers] = useState<User[]>([]);
   const dbRef = useRef(db);
   dbRef.current = db;
@@ -110,6 +115,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       let working = local;
       setLangState(local.settings.lang || "es");
+      setThemeState(local.settings.theme || "light");
 
       const configured = await serverConfigured();
       if (configured) {
@@ -165,6 +171,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Pull the server's copies, dropping the given local ids (server wins on
+  // conflict), and re-merge.
+  const reconcileFromServer = useCallback(
+    async (dropIds: string[]) => {
+      try {
+        const state = await fetchState();
+        const drop = new Set(dropIds);
+        const local = dbRef.current.inspections.filter((i) => !drop.has(i.id));
+        commit({
+          ...dbRef.current,
+          inspections: mergeInspections(local, state.inspections),
+        });
+        setSyncState("synced");
+      } catch {
+        setSyncState("offline");
+      }
+    },
+    [commit]
+  );
+
   // Flush unsynced inspections when we regain connectivity (server mode).
   useEffect(() => {
     if (mode !== "server" || !online || !user) return;
@@ -172,31 +198,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!pending.length) return;
     (async () => {
       let ok = true;
+      const conflicts: string[] = [];
       for (const insp of pending) {
         try {
           await pushInspection(insp);
-        } catch {
+        } catch (e) {
           ok = false;
+          if (e instanceof ConflictError) conflicts.push(insp.id);
         }
       }
-      if (ok) {
-        const next = {
+      if (conflicts.length) {
+        await reconcileFromServer(conflicts);
+      } else if (ok) {
+        commit({
           ...dbRef.current,
           inspections: dbRef.current.inspections.map((i) =>
             i.synced === false ? { ...i, synced: true } : i
           ),
-        };
-        commit(next);
+        });
         setSyncState("synced");
       }
     })();
-  }, [online, mode, user, commit]);
+  }, [online, mode, user, commit, reconcileFromServer]);
 
   // ── actions ────────────────────────────────────────────────────────────────
   const setLang = useCallback(
     (l: Lang) => {
       setLangState(l);
       commit({ ...dbRef.current, settings: { ...dbRef.current.settings, lang: l } });
+    },
+    [commit]
+  );
+
+  const setTheme = useCallback(
+    (th: Theme) => {
+      setThemeState(th);
+      commit({ ...dbRef.current, settings: { ...dbRef.current.settings, theme: th } });
     },
     [commit]
   );
@@ -277,10 +314,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             commit(next);
             setSyncState("synced");
           })
-          .catch(() => setSyncState("offline"));
+          .catch((err) => {
+            if (err instanceof ConflictError) void reconcileFromServer([stamped.id]);
+            else setSyncState("offline");
+          });
       }
     },
-    [mode, commit]
+    [mode, commit, reconcileFromServer]
   );
 
   const removeInspection = useCallback(
@@ -371,6 +411,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     lang,
     loginUsers,
     setLang,
+    theme,
+    setTheme,
     toggleRunningTotal,
     login,
     logout,

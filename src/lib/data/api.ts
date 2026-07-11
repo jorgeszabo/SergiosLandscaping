@@ -69,14 +69,22 @@ export async function fetchState(): Promise<ServerState> {
   return j<ServerState>(res);
 }
 
+/** Thrown when the server already has a newer version of the inspection. */
+export class ConflictError extends Error {
+  constructor() {
+    super("conflict");
+    this.name = "ConflictError";
+  }
+}
+
 export async function pushInspection(insp: Inspection): Promise<void> {
-  await fetch("/api/inspections", {
+  const r = await fetch("/api/inspections", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(insp),
-  }).then((r) => {
-    if (!r.ok) throw new Error("push inspection failed");
   });
+  if (r.status === 409) throw new ConflictError();
+  if (!r.ok) throw new Error("push inspection failed");
 }
 
 export async function pushCatalog(catalog: Catalog): Promise<void> {
