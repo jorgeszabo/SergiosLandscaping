@@ -78,6 +78,25 @@ aprobado (orden de trabajo) → en progreso → completado.
 
 ---
 
+## Documentos imprimibles
+
+Desde la pantalla **Revisar** de cualquier trabajo, los botones debajo de los
+totales abren documentos con marca que puedes **imprimir o guardar como PDF** —
+uno por etapa:
+
+| Documento | Muestra | Disponible |
+| --- | --- | --- |
+| **Reporte de inspección** | Vista del sistema, zonas, hallazgos (gravedad + notas), fotos — sin precios | Siempre |
+| **Estimado** | Líneas con precio + trabajos para visita futura + la **firma de aprobación del cliente y la fecha** | Cuando puedes ver precios |
+| **Orden de trabajo** | La lista de tareas del equipo (trabajo · cantidad · una casilla **Hecho** para marcar en campo), más la nota de aprobación — sin precios al cliente | Una vez aprobado |
+| **Certificado de finalización** | Trabajo completado + la **firma de finalización y la fecha** | Una vez completado |
+
+Cada uno abre en una página limpia; toca **Imprimir / guardar PDF** (elige
+"Guardar como PDF" en el diálogo de impresión para enviarlo por correo o
+archivarlo).
+
+---
+
 ## Clientes e historial de trabajos
 
 Abre **Clientes** (barra lateral en escritorio, menú **Más** en el teléfono)

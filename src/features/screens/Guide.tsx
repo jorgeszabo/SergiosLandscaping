@@ -17,6 +17,10 @@ const GUIDE = {
       p: "1. Submitted inspections appear under Jobs.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin.\n3. Approve → creates a work order.\n4. Start work, then Mark complete and capture the customer's completion signature.\n5. Print the branded proposal at any point. Billing after completion is handled by the office, outside the app.",
     },
     {
+      h: "Printable documents",
+      p: "From a job's Review screen, print or save-as-PDF four branded documents, one per stage: Inspection report (system, zones, findings, photos — no prices, always available); Estimate (priced, with the customer's approval signature — when you can see prices); Work order (the crew's task list with a Done checkbox, no customer pricing — once approved); and Completion certificate (with the completion signature — once completed).",
+    },
+    {
       h: "Customers & job history",
       p: "Open Customers from the menu to browse everyone in the database, searchable by name or address. Tap a customer to see their job history — every past inspection and work order at that property, with the date, status, what was found, and the total. Tap any past job to see the full detail (parts and labor used). Start a new inspection right from the customer. Admins can remove a customer added by mistake.",
     },
@@ -57,6 +61,10 @@ const GUIDE = {
     {
       h: "Para la oficina / admin",
       p: "1. Las inspecciones enviadas aparecen en Trabajos.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen.\n3. Aprobar → crea una orden de trabajo.\n4. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n5. Imprime la propuesta con marca en cualquier momento. La facturación posterior la maneja la oficina, fuera de la app.",
+    },
+    {
+      h: "Documentos imprimibles",
+      p: "Desde la pantalla Revisar de un trabajo, imprime o guarda como PDF cuatro documentos con marca, uno por etapa: Reporte de inspección (sistema, zonas, hallazgos, fotos — sin precios, siempre disponible); Estimado (con precios y la firma de aprobación del cliente — cuando puedes ver precios); Orden de trabajo (la lista de tareas del equipo con casilla Hecho, sin precios al cliente — una vez aprobado); y Certificado de finalización (con la firma de finalización — una vez completado).",
     },
     {
       h: "Clientes e historial",

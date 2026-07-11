@@ -70,6 +70,23 @@ Billing after a job is completed is handled by the office, outside the app.
 
 ---
 
+## Printable documents
+
+From any job's **Review** screen, the buttons under the totals open branded
+documents you can **print or save as PDF** — one per stage:
+
+| Document | Shows | Available |
+| --- | --- | --- |
+| **Inspection report** | System overview, zones, findings (severity + notes), photos — no prices | Always |
+| **Estimate** | Priced line items + future-visit items + the customer's **approval signature and date** | When you can see prices |
+| **Work order** | The crew's task list (work · quantity · a **Done** checkbox to tick in the field), plus the approval note — no customer pricing | Once approved |
+| **Completion certificate** | Work completed + the **completion signature and date** | Once completed |
+
+Each opens to a clean page; tap **Print / save PDF** (choose "Save as PDF" in
+the print dialog to email or file it).
+
+---
+
 ## Customers & job history
 
 Open **Customers** (sidebar on desktop, **More** menu on mobile) to browse
