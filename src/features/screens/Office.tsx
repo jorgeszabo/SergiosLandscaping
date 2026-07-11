@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
+import { useToast } from "@/components/Toast";
 import { useNav } from "../nav";
 import { inspectionTotals, money } from "@/lib/money/engine";
+import { IconTrash } from "@/components/icons";
 import type { InspectionStatus } from "@/lib/data/types";
 
 type Filter = "review" | "workorders" | "completed" | "all";
@@ -16,10 +18,18 @@ const badgeTone = (s: InspectionStatus): string => {
 };
 
 export function Office() {
-  const { db } = useStore();
+  const { db, user, removeInspection } = useStore();
   const { t } = useI18n();
+  const toast = useToast();
   const { navigate } = useNav();
   const [filter, setFilter] = useState<Filter>("review");
+  const isAdmin = !!user?.permissions.editCatalog;
+
+  const del = async (id: string) => {
+    if (!window.confirm(t("confirmDeleteInspection"))) return;
+    await removeInspection(id);
+    toast(t("inspectionDeleted"));
+  };
 
   const rows = db.inspections.filter((i) => {
     switch (filter) {
@@ -87,12 +97,13 @@ export function Office() {
               <th style={{ textAlign: "right" }}>{t("issuesWord")}</th>
               <th style={{ textAlign: "right" }}>{t("est")}</th>
               <th>{t("status")}</th>
+              {isAdmin && <th aria-label="actions" />}
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6}>
+                <td colSpan={isAdmin ? 7 : 6}>
                   <div className="empty">{t("noInsp")}</div>
                 </td>
               </tr>
@@ -118,6 +129,13 @@ export function Office() {
                   <td>
                     <span className={`badge ${badgeTone(insp.status)}`}>{t("st_" + insp.status)}</span>
                   </td>
+                  {isAdmin && (
+                    <td style={{ textAlign: "right" }} onClick={(e) => e.stopPropagation()}>
+                      <button className="iconbtn" title={t("deleteInspection")} aria-label={t("deleteInspection")} onClick={() => del(insp.id)}>
+                        <IconTrash size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}

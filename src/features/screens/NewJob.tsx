@@ -17,9 +17,16 @@ const NO_PW = { autoComplete: "off", "data-1p-ignore": true, "data-lpignore": "t
 
 export function NewJob() {
   const { insp, save } = useInspection();
-  const { db, addCustomer } = useStore();
+  const { db, addCustomer, discardDraft } = useStore();
   const { t } = useI18n();
   const { navigate, back } = useNav();
+
+  // Leaving the first screen of a brand-new inspection discards the unsaved
+  // draft (it was never persisted) so no empty entry is left behind.
+  const cancel = () => {
+    discardDraft();
+    back();
+  };
 
   const [customer, setCustomer] = useState(insp?.customer || "");
   const [address, setAddress] = useState(insp?.address || "");
@@ -204,7 +211,7 @@ export function NewJob() {
 
   return (
     <div style={{ maxWidth: 560 }}>
-      <button className="backlink" onClick={back}>
+      <button className="backlink" onClick={cancel}>
         <IconChevronLeft size={16} /> {t("back")}
       </button>
       <h1>{t("newInsp")}</h1>

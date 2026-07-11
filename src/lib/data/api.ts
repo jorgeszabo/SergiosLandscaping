@@ -87,6 +87,12 @@ export async function pushInspection(insp: Inspection): Promise<void> {
   if (!r.ok) throw new Error("push inspection failed");
 }
 
+export async function deleteInspectionApi(id: string): Promise<void> {
+  await fetch(`/api/inspections/${encodeURIComponent(id)}`, { method: "DELETE" }).then((r) => {
+    if (!r.ok) throw new Error("delete inspection failed");
+  });
+}
+
 export async function pushCatalog(catalog: Catalog): Promise<void> {
   await fetch("/api/catalog", {
     method: "PUT",

@@ -16,7 +16,7 @@ const badgeTone = (s: InspectionStatus): string => {
 };
 
 export function Home() {
-  const { db, user, upsertInspection } = useStore();
+  const { db, user, beginDraft } = useStore();
   const { t } = useI18n();
   const { navigate } = useNav();
   if (!user) return null;
@@ -34,7 +34,7 @@ export function Home() {
       snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
       zones: [], lines: [],
     };
-    upsertInspection(insp);
+    beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
 

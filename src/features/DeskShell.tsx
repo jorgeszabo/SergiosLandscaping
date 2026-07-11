@@ -14,7 +14,7 @@ import {
 /* Desktop operations shell for office/admin — sidebar + topbar, from the
    company Design System app kit. Field techs / phones use the mobile shell. */
 export function DeskShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, upsertInspection } = useStore();
+  const { user, lang, setLang, logout, beginDraft } = useStore();
   const { t } = useI18n();
   const { view, navigate } = useNav();
   if (!user) return null;
@@ -37,7 +37,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
       snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
       zones: [], lines: [],
     };
-    upsertInspection(insp);
+    beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
 

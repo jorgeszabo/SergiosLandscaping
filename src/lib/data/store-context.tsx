@@ -42,6 +42,7 @@ import {
   saveUserApi,
   deleteUserApi,
   deleteCustomerApi,
+  deleteInspectionApi,
   ConflictError,
 } from "./api";
 
@@ -63,8 +64,13 @@ interface StoreValue {
   toggleRunningTotal: () => void;
   login: (userId: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** A new inspection held in memory only — not persisted until it gains
+      real data (via upsertInspection). Prevents empty "trash" drafts. */
+  pendingDraft: Inspection | null;
+  beginDraft: (insp: Inspection) => void;
+  discardDraft: () => void;
   upsertInspection: (insp: Inspection) => void;
-  removeInspection: (id: string) => void;
+  removeInspection: (id: string) => Promise<void>;
   saveCatalog: (catalog: Catalog) => Promise<void>;
   addCustomer: (c: Customer) => void;
   deleteCustomer: (id: string) => Promise<void>;
@@ -100,8 +106,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("es");
   const [theme, setThemeState] = useState<Theme>("light");
   const [loginUsers, setLoginUsers] = useState<User[]>([]);
+  const [pendingDraft, setPendingDraft] = useState<Inspection | null>(null);
   const dbRef = useRef(db);
   dbRef.current = db;
+  const pendingRef = useRef(pendingDraft);
+  pendingRef.current = pendingDraft;
 
   const commit = useCallback((next: Database) => {
     dbRef.current = next;
@@ -294,8 +303,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     commit({ ...dbRef.current, session: null });
   }, [mode, commit]);
 
+  // Start a new inspection without persisting it. It only becomes a real
+  // (saved) record once upsertInspection runs with actual data — so backing
+  // out of a blank New-inspection flow leaves no empty draft behind.
+  const beginDraft = useCallback((insp: Inspection) => {
+    setPendingDraft(insp);
+  }, []);
+
+  const discardDraft = useCallback(() => {
+    setPendingDraft(null);
+  }, []);
+
   const upsertInspection = useCallback(
     (insp: Inspection) => {
+      // First real save promotes the in-memory draft to a stored inspection.
+      if (pendingRef.current?.id === insp.id) setPendingDraft(null);
       const stamped: Inspection = { ...insp, updatedAt: Date.now(), synced: false };
       const exists = dbRef.current.inspections.some((i) => i.id === stamped.id);
       const inspections = exists
@@ -326,13 +348,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const removeInspection = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      if (pendingRef.current?.id === id) setPendingDraft(null);
       commit({
         ...dbRef.current,
         inspections: dbRef.current.inspections.filter((i) => i.id !== id),
       });
+      if (mode === "server" && navigator.onLine) await deleteInspectionApi(id);
     },
-    [commit]
+    [mode, commit]
   );
 
   const saveCatalog = useCallback(
@@ -429,6 +453,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     toggleRunningTotal,
     login,
     logout,
+    pendingDraft,
+    beginDraft,
+    discardDraft,
     upsertInspection,
     removeInspection,
     saveCatalog,

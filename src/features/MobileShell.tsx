@@ -15,7 +15,7 @@ import {
 } from "@/components/icons";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, upsertInspection } = useStore();
+  const { user, lang, setLang, logout, beginDraft } = useStore();
   const { view, navigate } = useNav();
   const { t } = useI18n();
   const [more, setMore] = useState(false);
@@ -32,7 +32,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
       snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
       zones: [], lines: [],
     };
-    upsertInspection(insp);
+    beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
 
