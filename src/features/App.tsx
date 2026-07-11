@@ -5,6 +5,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { ToastProvider } from "@/components/Toast";
 import { NavProvider, useNav } from "./nav";
 import { Header } from "./Header";
+import { DeskShell } from "./DeskShell";
 import { Login } from "./screens/Login";
 import { Home } from "./screens/Home";
 import { NewJob } from "./screens/NewJob";
@@ -16,6 +17,7 @@ import { Review } from "./screens/Review";
 import { Print } from "./screens/Print";
 import { Catalog } from "./screens/Catalog";
 import { Office } from "./screens/Office";
+import { Team } from "./screens/Team";
 
 export default function App() {
   return (
@@ -64,10 +66,17 @@ function Root() {
 }
 
 function Shell() {
-  const { view } = useNav();
-  const wide = view.name === "office" || view.name === "catalog";
+  const { user } = useStore();
+  const isOffice = user?.role === "office" || user?.role === "admin";
+  if (isOffice) {
+    return (
+      <DeskShell>
+        <Screen />
+      </DeskShell>
+    );
+  }
   return (
-    <div className={`app${wide ? " wide" : ""}`}>
+    <div className="app">
       <Header />
       <main>
         <Screen />
@@ -99,6 +108,8 @@ function Screen() {
       return <Catalog />;
     case "office":
       return <Office />;
+    case "team":
+      return <Team />;
     default:
       return <Home />;
   }

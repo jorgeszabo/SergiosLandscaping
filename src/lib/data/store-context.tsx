@@ -37,6 +37,8 @@ import {
   pushInspection,
   pushCatalog,
   pushCustomer,
+  saveUserApi,
+  deleteUserApi,
 } from "./api";
 
 export type SyncState = "local" | "synced" | "pending" | "offline";
@@ -59,6 +61,8 @@ interface StoreValue {
   removeInspection: (id: string) => void;
   saveCatalog: (catalog: Catalog) => Promise<void>;
   addCustomer: (c: Customer) => void;
+  saveUser: (user: User, password?: string) => Promise<void>;
+  deleteUser: (id: string) => Promise<void>;
   resetLocal: () => Promise<void>;
 }
 
@@ -306,6 +310,29 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [mode, commit]
   );
 
+  const saveUser = useCallback(
+    async (user: User, password?: string) => {
+      const exists = dbRef.current.users.some((u) => u.id === user.id);
+      const users = exists
+        ? dbRef.current.users.map((u) => (u.id === user.id ? { ...u, ...user } : u))
+        : [...dbRef.current.users, user];
+      commit({ ...dbRef.current, users });
+      setLoginUsers(users);
+      if (mode === "server") await saveUserApi(user, password);
+    },
+    [mode, commit]
+  );
+
+  const deleteUser = useCallback(
+    async (id: string) => {
+      const users = dbRef.current.users.filter((u) => u.id !== id);
+      commit({ ...dbRef.current, users });
+      setLoginUsers(users);
+      if (mode === "server") await deleteUserApi(id);
+    },
+    [mode, commit]
+  );
+
   const resetLocal = useCallback(async () => {
     await idbReset();
     const fresh = freshDatabase();
@@ -331,6 +358,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     removeInspection,
     saveCatalog,
     addCustomer,
+    saveUser,
+    deleteUser,
     resetLocal,
   };
 
