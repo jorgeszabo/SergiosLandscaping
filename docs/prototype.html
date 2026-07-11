@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sergio's Irrigation</title>
+<style>
+:root{
+  --ink:#16211c; --paper:#eef1ec; --card:#ffffff; --pine:#1f5c46; --pine-d:#154232;
+  --amber:#c67f14; --amber-bg:#fbf1dc; --muted:#67736c; --line:#dde3dd;
+  --danger:#a83a3a; --defer:#8a7526; --ok:#1f5c46;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.45;-webkit-text-size-adjust:100%}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px}
+.app{max-width:760px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+header.bar{position:sticky;top:0;z-index:10;background:var(--pine);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top))}
+header.bar .brand{font-weight:700;letter-spacing:.2px;font-size:16px;flex:1;display:flex;align-items:center;gap:8px}
+header.bar .brand small{font-weight:400;opacity:.8;font-size:12px}
+header.bar .drop{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:8px;padding:6px 9px;font-size:13px;font-weight:600}
+main{flex:1;padding:16px;padding-bottom:40px}
+h1{font-size:22px;margin:.1em 0 .5em;letter-spacing:-.01em}
+h2{font-size:15px;margin:1.4em 0 .5em;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.sub{color:var(--muted);font-size:14px;margin:-.2em 0 1em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+.row{display:flex;gap:10px;align-items:center}
+label.f{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px;font-weight:600}
+input.t,select.t,textarea.t{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+input.t:focus,select.t:focus,textarea.t:focus{outline:2px solid var(--pine);outline-offset:0;border-color:var(--pine)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:11px;padding:12px 15px;font-size:15px;font-weight:600}
+.btn:active{transform:scale(.985)}
+.btn.pri{background:var(--pine);border-color:var(--pine);color:#fff}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#fff}
+.btn.ghost{background:transparent}
+.btn.block{width:100%}
+.btn.sm{padding:8px 11px;font-size:13px;border-radius:9px}
+.btn.danger{color:var(--danger);border-color:#e7cccc}
+.stack>*{margin-bottom:10px}
+.stack>*:last-child{margin-bottom:0}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:22px;background:#fff;font-size:14px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--pine);border-color:var(--pine);color:#fff}
+.list .item{display:flex;align-items:center;gap:12px;padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.list .item:last-child{border-bottom:none}
+.list .item .g{flex:1;min-width:0}
+.list .item .g .n{font-weight:600}
+.list .item .g .m{font-size:13px;color:var(--muted)}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.badge.new{background:var(--amber-bg);color:var(--amber)}
+.badge.done{background:#e3ede8;color:var(--pine)}
+.badge.gray{background:#eceee9;color:var(--muted)}
+.money{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+.price-pop{background:var(--amber-bg);border:1px solid #edd9ac;color:var(--amber);border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;animation:pop .28s ease}
+.price-pop .lbl{font-size:13px;font-weight:600;color:#9a6a13}
+.price-pop .amt{font-family:var(--mono);font-size:20px}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.qline{display:flex;align-items:flex-start;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}
+.qline .g{flex:1;min-width:0}
+.qline .g .n{font-weight:600}
+.qline .g .m{font-size:12.5px;color:var(--muted)}
+.qline .p{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.qline.off{opacity:.55}
+.qline.off .p{text-decoration:line-through}
+.dots{border:none;background:transparent;font-size:20px;color:var(--muted);padding:2px 6px;line-height:1}
+.tot{display:flex;justify-content:space-between;padding:6px 2px;color:var(--muted);font-size:14px}
+.tot .money{color:var(--ink)}
+.tot.big{font-size:20px;color:var(--ink);font-weight:700;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px}
+.tot.big .money{font-size:22px}
+.sechead{display:flex;align-items:center;justify-content:space-between}
+.pillbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.menu{position:fixed;inset:0;background:rgba(20,30,25,.4);display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:14px}
+.menu .sheet{background:#fff;border-radius:16px;width:100%;max-width:440px;padding:8px;box-shadow:0 -4px 30px rgba(0,0,0,.2)}
+.menu .sheet button{display:block;width:100%;text-align:left;border:none;background:transparent;padding:14px 14px;font-size:16px;border-radius:10px;font-weight:600;color:var(--ink)}
+.menu .sheet button:active{background:var(--paper)}
+.menu .sheet button.dz{color:var(--danger)}
+.empty{text-align:center;color:var(--muted);padding:34px 10px}
+.empty .big{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.backlink{background:none;border:none;color:var(--pine);font-weight:600;font-size:15px;padding:0;margin:0 0 4px;display:inline-flex;align-items:center;gap:5px}
+.thumb{width:46px;height:46px;border-radius:9px;object-fit:cover;border:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:12.5px;color:var(--muted);background:var(--paper);border-radius:9px;padding:9px 11px;margin-top:8px}
+.sev{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.sev.safety{background:var(--danger)}.sev.functional{background:var(--amber)}.sev.efficiency{background:var(--pine)}
+@media print{
+  body{background:#fff}
+  header.bar,.noprint{display:none!important}
+  .app{max-width:100%}
+  main{padding:0}
+  .card{border:none;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+"use strict";
+/* ---------- i18n strings ---------- */
+const STR={
+ en:{appName:"Sergio's Irrigation",tagline:"Inspection & repair quotes",login:"Sign in",who:"Who's using this?",cont:"Continue",
+ newInsp:"New inspection",inspections:"Inspections",catalog:"Catalog",logout:"Sign out",
+ customer:"Customer",address:"Address",city:"City, state, zip",next:"Next",start:"Start inspection",
+ sysOverview:"System overview",brand:"Controller brand",model:"Model",stations:"Number of stations",createsZones:"creates this many zones",
+ backflow:"Backflow type",pressure:"Static pressure (psi)",rainSensor:"Rain sensor present",yes:"Yes",no:"No",saveNext:"Save & see zones",
+ zonesHub:"Zones",zone:"Zone",notStarted:"not started",hasIssues:"issue",hasIssuesP:"issues",clean:"looks good",
+ addSysIssue:"Add system-wide issue",reviewPrice:"Review & price",systemWide:"System-wide",
+ makeup:"What it waters",turf:"Turf",beds:"Beds",headTypes:"Head types present",
+ spray:"Spray",rotor:"Rotor",drip:"Drip",bubbler:"Bubbler",sched:"Current schedule",schedPh:"e.g. Mon/Wed/Fri 6am, 15 min",
+ issuesHere:"Issues found here",addIssue:"Add issue",done:"Done",noIssues:"No issues logged yet.",
+ pickIssue:"What's the problem?",count:"How many?",severity:"Severity",safety:"Safety",functional:"Functional",efficiency:"Efficiency",
+ repair:"Repair",replace:"Replace",photo:"Photo (optional)",addPhoto:"Add photo",estAppears:"Estimated fix",saveIssue:"Save issue",
+ review:"Review & quote",onQuote:"On this quote",deferredH:"Deferred — future visit",declinedH:"Declined",
+ parts:"Parts",laborL:"Labor",cost:"Est. cost",margin:"Margin",total:"Total",
+ approve:"Approve → work order",approved:"Approved work order",printQuote:"Print / save quote",sendBack:"Reopen for edits",
+ addPart:"Part",addLabor:"Labor",addAssembly:"Assembly",addLocal:"Local purchase",addLine:"Add line",
+ moveOnQuote:"Move to quote",moveDefer:"Defer to future visit",moveDecline:"Mark declined",remove:"Remove",
+ catTitle:"Catalog",tabParts:"Parts",tabLabor:"Labor",tabAssm:"Assemblies",tabIssues:"Issues",
+ unitCost:"Cost",sellPrice:"Price",save:"Save",edited:"Saved",recipe:"Recipe",rolled:"shown as one line",
+ back:"Back",cancel:"Cancel",qty:"Qty",name:"Description",priceEach:"Price",local:"Local purchase",
+ quoteFor:"Quote for",dateL:"Date",techL:"Tech",thankyou:"Thank you for your business.",
+ sig:"Customer signature",signHint:"Sign on the device or on the printed copy",submit:"Submit",
+ runningOn:"Show running total",estimate:"Estimate",adminOnly:"Admin only",
+ noInsp:"No inspections yet.",tapNew:"Tap “New inspection” to start one.",
+ controllerBrand:"Controller",issuesWord:"issues",priced:"priced",of:"of",
+ futureNote:"Recommended for a future visit:",langName:"English"},
+ es:{appName:"Riego Sergio's",tagline:"Inspección y cotización de reparaciones",login:"Iniciar sesión",who:"¿Quién lo está usando?",cont:"Continuar",
+ newInsp:"Nueva inspección",inspections:"Inspecciones",catalog:"Catálogo",logout:"Cerrar sesión",
+ customer:"Cliente",address:"Dirección",city:"Ciudad, estado, código",next:"Siguiente",start:"Comenzar inspección",
+ sysOverview:"Vista del sistema",brand:"Marca del control",model:"Modelo",stations:"Número de estaciones",createsZones:"crea esta cantidad de zonas",
+ backflow:"Tipo de antisifón",pressure:"Presión estática (psi)",rainSensor:"Sensor de lluvia presente",yes:"Sí",no:"No",saveNext:"Guardar y ver zonas",
+ zonesHub:"Zonas",zone:"Zona",notStarted:"sin empezar",hasIssues:"problema",hasIssuesP:"problemas",clean:"bien",
+ addSysIssue:"Agregar problema general",reviewPrice:"Revisar y cotizar",systemWide:"General",
+ makeup:"Qué riega",turf:"Césped",beds:"Jardineras",headTypes:"Tipos de cabezas",
+ spray:"Aspersor",rotor:"Rotor",drip:"Goteo",bubbler:"Burbujeador",sched:"Horario actual",schedPh:"ej. Lun/Mié/Vie 6am, 15 min",
+ issuesHere:"Problemas encontrados aquí",addIssue:"Agregar problema",done:"Listo",noIssues:"Aún no hay problemas.",
+ pickIssue:"¿Cuál es el problema?",count:"¿Cuántos?",severity:"Gravedad",safety:"Seguridad",functional:"Funcional",efficiency:"Eficiencia",
+ repair:"Reparar",replace:"Reemplazar",photo:"Foto (opcional)",addPhoto:"Agregar foto",estAppears:"Reparación estimada",saveIssue:"Guardar problema",
+ review:"Revisar y cotizar",onQuote:"En esta cotización",deferredH:"Diferido — visita futura",declinedH:"Rechazado",
+ parts:"Piezas",laborL:"Mano de obra",cost:"Costo est.",margin:"Margen",total:"Total",
+ approve:"Aprobar → orden de trabajo",approved:"Orden de trabajo aprobada",printQuote:"Imprimir / guardar cotización",sendBack:"Reabrir para editar",
+ addPart:"Pieza",addLabor:"Mano de obra",addAssembly:"Ensamble",addLocal:"Compra local",addLine:"Agregar línea",
+ moveOnQuote:"Mover a cotización",moveDefer:"Diferir a visita futura",moveDecline:"Marcar rechazado",remove:"Eliminar",
+ catTitle:"Catálogo",tabParts:"Piezas",tabLabor:"Mano de obra",tabAssm:"Ensambles",tabIssues:"Problemas",
+ unitCost:"Costo",sellPrice:"Precio",save:"Guardar",edited:"Guardado",recipe:"Receta",rolled:"se muestra como una línea",
+ back:"Atrás",cancel:"Cancelar",qty:"Cant.",name:"Descripción",priceEach:"Precio",local:"Compra local",
+ quoteFor:"Cotización para",dateL:"Fecha",techL:"Técnico",thankyou:"Gracias por su preferencia.",
+ sig:"Firma del cliente",signHint:"Firme en el dispositivo o en la copia impresa",submit:"Enviar",
+ runningOn:"Mostrar total actual",estimate:"Estimado",adminOnly:"Solo admin",
+ noInsp:"Aún no hay inspecciones.",tapNew:"Toca “Nueva inspección” para empezar.",
+ controllerBrand:"Control",issuesWord:"problemas",priced:"cotizado",of:"de",
+ futureNote:"Recomendado para una visita futura:",langName:"Español"}
+};
+/* ---------- seed data ---------- */
+function seed(){
+ const P=(id,en,es,brand,model,vendor,sku,unit,cost,price)=>({id,name:{en,es},brand,model,vendor,sku,unit,cost,price,onHand:true});
+ const parts=[
+  P("rotor_pgp","Rotor — Hunter PGP","Rotor — Hunter PGP","Hunter","PGP Ultra","Ewing","PGP-ADJ","each",10,25),
+  P("rotor_nozzle","Rotor nozzle set","Juego de boquillas rotor","Hunter","PGP rack","Ewing","PGP-NOZ","set",2,6),
+  P("spray_body","Pop-up spray head 4\"","Aspersor emergente 4\"","Hunter","PROS-04","Ewing","PROS-04","each",3,8),
+  P("spray_nozzle","Spray nozzle","Boquilla de aspersión","Hunter","Pro-Spray","Ewing","PS-NOZ","each",1.5,5),
+  P("mp_rotator","MP Rotator nozzle","Boquilla MP Rotator","Hunter","MP2000","Ewing","MP2000","each",6,14),
+  P("valve1","Electric valve 1\"","Válvula eléctrica 1\"","Hunter","PGV-101G","Ewing","PGV-101G","each",16,35),
+  P("solenoid","Solenoid","Solenoide","Hunter","458200","Ewing","458200","each",10,25),
+  P("rain_sensor","Rain sensor","Sensor de lluvia","Hunter","Mini-Clik","Ewing","MINI-CLIK","each",22,45),
+  P("pvb","Backflow PVB 1\"","Antisifón PVB 1\"","Febco","765","SiteOne","765-100","each",70,130),
+  P("controller4","Controller 4-zone","Control 4 zonas","Hunter","X-Core","Ewing","XC-400","each",90,160),
+  P("pvc34","PVC pipe 3/4\"","Tubo PVC 3/4\"","","Cl 200","SiteOne","PVC34","ft",0.4,1.25),
+  P("wire","Irrigation wire","Cable de riego","","18ga","SiteOne","WIRE18","ft",0.2,0.75),
+  P("fittings","PVC fittings","Conexiones PVC","","Sch 40","SiteOne","FIT","each",1,4),
+  P("swing_joint","Swing joint","Codo articulado","","","Ewing","SWING","each",2,6),
+  P("valve_box","Valve box","Caja de válvula","NDS","111BC","SiteOne","111BC","each",8,20),
+  P("wire_conn","Wire connectors","Conectores de cable","3M","DBR/Y","SiteOne","DBRY","each",1,4)
+ ];
+ const L=(id,en,es,unit,rate)=>({id,name:{en,es},unit,rate});
+ const labor=[
+  L("trip","Service call","Visita de servicio","flat",75),
+  L("std","Standard labor","Mano de obra","hour",85),
+  L("skilled","Skilled labor","Mano de obra especializada","hour",110)
+ ];
+ const I=(id,en,es,sev,act,partId,laborId,laborQty,attr)=>({id,name:{en,es},severity:sev,action:act,partId,laborId,laborQty,attr});
+ const headAttr={id:"head",name:{en:"Head type",es:"Tipo de cabeza"},options:[
+   {val:"spray",label:{en:"Spray",es:"Aspersor"},partId:"spray_body"},
+   {val:"rotor",label:{en:"Rotor",es:"Rotor"},partId:"rotor_pgp"},
+   {val:"drip",label:{en:"Drip/MP",es:"Goteo/MP"},partId:"mp_rotator"}]};
+ const nozAttr={id:"noz",name:{en:"Nozzle type",es:"Tipo de boquilla"},options:[
+   {val:"spray",label:{en:"Spray",es:"Aspersor"},partId:"spray_nozzle"},
+   {val:"rotor",label:{en:"Rotor",es:"Rotor"},partId:"rotor_nozzle"}]};
+ const issues=[
+  I("broken_head","Broken head","Cabeza rota","functional","replace",null,"std",0.25,headAttr),
+  I("broken_nozzle","Broken nozzle","Boquilla rota","functional","replace",null,"std",0.15,nozAttr),
+  I("poor_layout","Poor head layout","Mala distribución","efficiency","repair",null,"std",0.5,null),
+  I("adjust_nozzles","Adjust nozzles","Ajustar boquillas","efficiency","repair",null,"std",0.15,null),
+  I("not_aligned","Heads not aligned","Cabezas desalineadas","efficiency","repair",null,"std",0.15,null),
+  I("raise_heads","Raise heads","Subir cabezas","functional","repair","swing_joint","std",0.25,null),
+  I("lower_heads","Lower heads","Bajar cabezas","efficiency","repair",null,"std",0.2,null),
+  I("under_pressure","Under pressure","Baja presión","functional","repair",null,"skilled",0.5,null),
+  I("over_pressure","Over pressure","Alta presión","efficiency","repair","spray_nozzle","std",0.25,null),
+  I("obstructions","Obstructions","Obstrucciones","efficiency","repair",null,"std",0.15,null),
+  I("overspray","Overspray","Sobrerriego","efficiency","repair","spray_nozzle","std",0.15,null),
+  I("hydrozoning","Needs hydrozoning","Requiere hidrozonas","efficiency","replace","valve1","skilled",1,null),
+  I("leak_lateral","Leak in lateral","Fuga en lateral","functional","repair","fittings","std",0.5,null),
+  I("leak_main","Leak in main","Fuga en línea principal","safety","repair","fittings","skilled",1,null),
+  I("exposed_pipe","Exposed pipe","Tubo expuesto","safety","repair",null,"std",0.3,null),
+  I("exposed_wire","Exposed wire","Cable expuesto","safety","repair","wire_conn","std",0.25,null)
+ ];
+ const assemblies=[{id:"new_zone",name:{en:"New zone install",es:"Instalar zona nueva"},
+   recipe:[{kind:"part",id:"valve1",qty:1},{kind:"part",id:"wire",qty:50},{kind:"part",id:"pvc34",qty:40},
+           {kind:"part",id:"rotor_pgp",qty:4},{kind:"labor",id:"std",qty:3}],price:600,rolled:true}];
+ const users=[
+  {id:"antonio",name:"Antonio",role:"field",canPrice:true,lang:"es"},
+  {id:"luis",name:"Luis",role:"field",canPrice:true,lang:"es"},
+  {id:"admin",name:"Admin",role:"admin",canPrice:true,lang:"en"}
+ ];
+ return {version:1,users,catalog:{parts,labor,issues,assemblies},inspections:[],settings:{lang:"es"},session:null};
+}
+/* ---------- store ---------- */
+const KEY="sergios_irrigation_v1";
+let DB;
+function load(){try{const r=localStorage.getItem(KEY);DB=r?JSON.parse(r):seed();}catch(e){DB=seed();}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}}
+load();
+let LANG=DB.settings.lang||"es";
+const t=k=>(STR[LANG]&&STR[LANG][k])||STR.en[k]||k;
+const nm=o=>o?(o[LANG]||o.en):"";
+const money=n=>"$"+(Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const uid=()=>Math.random().toString(36).slice(2,9);
+function catPart(id){return DB.catalog.parts.find(p=>p.id===id);}
+function catLabor(id){return DB.catalog.labor.find(l=>l.id===id);}
+function catIssue(id){return DB.catalog.issues.find(i=>i.id===id);}
+function catAssembly(id){return DB.catalog.assemblies.find(a=>a.id===id);}
+/* ---------- money engine ---------- */
+function laborLineCost(l,qty){return l.rate*qty*0.6;}
+function priceLine(line){
+ // returns {price, cost, detail}
+ if(line.kind==="issue"){
+   const def=catIssue(line.issueId); if(!def)return{price:0,cost:0,detail:""};
+   let price=0,cost=0;const bits=[];
+   let partId=def.partId;
+   if(def.attr&&line.attrVal){const o=def.attr.options.find(x=>x.val===line.attrVal);if(o)partId=o.partId;}
+   if(partId){const p=catPart(partId);if(p){price+=p.price*line.count;cost+=p.cost*line.count;bits.push(line.count+"× "+nm(p.name));}}
+   if(def.laborId){const l=catLabor(def.laborId);if(l){const q=(l.unit==="flat"?1:def.laborQty)*line.count;price+=l.rate*q;cost+=laborLineCost(l,q);bits.push(nm(l.name));}}
+   return{price,cost,detail:bits.join(" + ")};
+ }
+ if(line.kind==="part"){const p=catPart(line.refId);if(!p)return{price:0,cost:0,detail:""};return{price:p.price*line.count,cost:p.cost*line.count,detail:line.count+"× "+nm(p.name)};}
+ if(line.kind==="labor"){const l=catLabor(line.refId);if(!l)return{price:0,cost:0,detail:""};return{price:l.rate*line.count,cost:laborLineCost(l,line.count),detail:line.count+(l.unit==="hour"?" hr":"")+" "+nm(l.name)};}
+ if(line.kind==="assembly"){const a=catAssembly(line.refId);if(!a)return{price:0,cost:0,detail:""};let cost=0;a.recipe.forEach(r=>{if(r.kind==="part"){const p=catPart(r.id);if(p)cost+=p.cost*r.qty;}else{const l=catLabor(r.id);if(l)cost+=laborLineCost(l,r.qty);}});return{price:a.price*line.count,cost:cost*line.count,detail:nm(a.name)};}
+ if(line.kind==="local"){return{price:(line.price||0),cost:(line.cost!=null?line.cost:line.price||0),detail:line.name||t("local")};}
+ return{price:0,cost:0,detail:""};
+}
+function lineName(line){
+ if(line.kind==="issue"){const d=catIssue(line.issueId);return d?nm(d.name):"—";}
+ if(line.kind==="part"){const p=catPart(line.refId);return p?nm(p.name):"—";}
+ if(line.kind==="labor"){const l=catLabor(line.refId);return l?nm(l.name):"—";}
+ if(line.kind==="assembly"){const a=catAssembly(line.refId);return a?nm(a.name):"—";}
+ if(line.kind==="local"){return line.name||t("local");}
+ return "—";
+}
+function inspTotals(insp){
+ let price=0,cost=0,parts=0,labor=0;
+ insp.lines.forEach(line=>{if(line.state!=="on")return;const r=priceLine(line);price+=r.price;cost+=r.cost;});
+ // rough split
+ insp.lines.forEach(line=>{if(line.state!=="on")return;const r=priceLine(line);
+   if(line.kind==="labor")labor+=r.price;else if(line.kind==="issue"){const d=catIssue(line.issueId);if(d&&d.laborId){const l=catLabor(d.laborId);const q=(l.unit==="flat"?1:d.laborQty)*line.count;labor+=l.rate*q;}}});
+ parts=price-labor;
+ const margin=price>0?(price-cost)/price:0;
+ return{price,cost,parts,labor,margin};
+}
+function zoneStatus(insp,z){
+ const issues=insp.lines.filter(l=>l.kind==="issue"&&l.zone===z.n);
+ if(z._visited||issues.length){return issues.length?{k:"issues",n:issues.length}:{k:"clean"};}
+ return{k:"new"};
+}
+/* ---------- app state ---------- */
+let VIEW={name:"login"};
+let SHEET=null;
+function go(name,params){VIEW=Object.assign({name},params||{});SHEET=null;render();}
+function currentInsp(){return DB.inspections.find(i=>i.id===VIEW.inspId);}
+/* ---------- render ---------- */
+const app=document.getElementById("app");
+function el(html){const d=document.createElement("div");d.innerHTML=html.trim();return d.firstChild;}
+function render(){
+ app.innerHTML="";
+ if(VIEW.name==="login"){app.appendChild(viewLogin());return;}
+ app.appendChild(header());
+ const main=document.createElement("main");
+ let v;
+ switch(VIEW.name){
+   case"home":v=viewHome();break;
+   case"newJob":v=viewNewJob();break;
+   case"snapshot":v=viewSnapshot();break;
+   case"zones":v=viewZones();break;
+   case"zone":v=viewZone();break;
+   case"addIssue":v=viewAddIssue();break;
+   case"review":v=viewReview();break;
+   case"catalog":v=viewCatalog();break;
+   case"print":v=viewPrint();break;
+   default:v=viewHome();
+ }
+ main.appendChild(v);app.appendChild(main);
+ if(SHEET)app.appendChild(SHEET);
+ window.scrollTo(0,0);
+}
+function header(){
+ const h=el(`<header class="bar noprint">
+   <div class="brand"><span>💧</span><span>${t("appName")}</span></div>
+   <button class="drop" id="langBtn">${LANG==="es"?"ES":"EN"}</button>
+   <button class="drop" id="homeBtn">☰</button>
+ </header>`);
+ h.querySelector("#langBtn").onclick=()=>{LANG=LANG==="es"?"en":"es";DB.settings.lang=LANG;save();render();};
+ h.querySelector("#homeBtn").onclick=()=>go("home");
+ return h;
+}
+/* ---- login ---- */
+function viewLogin(){
+ const wrap=el(`<main style="display:flex;flex-direction:column;justify-content:center;min-height:100vh">
+   <div style="text-align:center;margin-bottom:6px;font-size:40px">💧</div>
+   <h1 style="text-align:center">${t("appName")}</h1>
+   <p class="sub" style="text-align:center">${t("tagline")}</p>
+   <div class="card" style="margin-top:10px">
+     <label class="f">${t("who")}</label>
+     <div class="stack" id="users"></div>
+     <div class="row" style="justify-content:center;margin-top:14px;gap:14px">
+       <button class="chip ${LANG==="es"?"on":""}" data-l="es">Español</button>
+       <button class="chip ${LANG==="en"?"on":""}" data-l="en">English</button>
+     </div>
+   </div>
+ </main>`);
+ const ul=wrap.querySelector("#users");
+ DB.users.forEach(u=>{
+   const b=el(`<button class="btn block" style="justify-content:space-between">
+     <span>${u.name}</span>
+     <span class="badge ${u.role==="admin"?"done":"gray"}">${u.role==="admin"?"Admin":t("techL")}</span></button>`);
+   b.onclick=()=>{DB.session=u.id;if(u.lang){LANG=u.lang;DB.settings.lang=LANG;}save();go("home");};
+   ul.appendChild(b);
+ });
+ wrap.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{LANG=b.dataset.l;DB.settings.lang=LANG;save();render();});
+ return wrap;
+}
+function me(){return DB.users.find(u=>u.id===DB.session)||DB.users[0];}
+/* ---- home ---- */
+function viewHome(){
+ const u=me();
+ const wrap=el(`<div>
+   <h1>${t("inspections")}</h1>
+   <p class="sub">${u.name} · ${u.role==="admin"?"Admin":t("techL")}</p>
+   <button class="btn pri block" id="new">＋ ${t("newInsp")}</button>
+   <div class="card" style="margin-top:14px"><div class="list" id="list"></div></div>
+   ${u.role==="admin"?`<button class="btn block ghost" id="cat" style="margin-top:2px">⚙︎ ${t("catalog")}</button>`:""}
+   <button class="btn block ghost" id="out" style="margin-top:8px;color:var(--muted)">${t("logout")}</button>
+ </div>`);
+ wrap.querySelector("#new").onclick=()=>{
+   const insp={id:uid(),customer:"",address:"",city:"",tech:u.name,date:new Date().toISOString().slice(0,10),status:"draft",snapshot:{brand:"",model:"",stations:"",backflow:"",pressure:"",rainSensor:""},zones:[],lines:[]};
+   DB.inspections.unshift(insp);save();go("newJob",{inspId:insp.id});
+ };
+ const list=wrap.querySelector("#list");
+ if(!DB.inspections.length){list.appendChild(el(`<div class="empty"><div class="big">${t("noInsp")}</div><div>${t("tapNew")}</div></div>`));}
+ DB.inspections.forEach(insp=>{
+   const tot=inspTotals(insp);
+   const issues=insp.lines.filter(l=>l.kind==="issue").length;
+   const it=el(`<div class="item"><div class="g">
+       <div class="n">${insp.customer||"—"}</div>
+       <div class="m">${insp.address||""} · ${insp.tech} · ${insp.date}</div></div>
+       <div style="text-align:right">
+         <div class="money">${money(tot.price)}</div>
+         <div class="m" style="font-size:12px;color:var(--muted)">${issues} ${t("issuesWord")}</div></div>
+       <span class="badge ${insp.status==="approved"?"done":"new"}">${insp.status==="approved"?"✓":"•"}</span></div>`);
+   it.onclick=()=>go(insp.zones.length?"zones":"newJob",{inspId:insp.id});
+   list.appendChild(it);
+ });
+ const cat=wrap.querySelector("#cat");if(cat)cat.onclick=()=>go("catalog",{tab:"parts"});
+ wrap.querySelector("#out").onclick=()=>{DB.session=null;save();go("login");};
+ return wrap;
+}
+/* ---- new job ---- */
+function viewNewJob(){
+ const insp=currentInsp();
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("back")}</button>
+   <h1>${t("newInsp")}</h1>
+   <div class="card stack">
+     <div><label class="f">${t("customer")}</label><input class="t" id="customer" value="${esc(insp.customer)}" placeholder="${t("customer")}"></div>
+     <div><label class="f">${t("address")}</label><input class="t" id="address" value="${esc(insp.address)}"></div>
+     <div><label class="f">${t("city")}</label><input class="t" id="city" value="${esc(insp.city)}"></div>
+   </div>
+   <button class="btn pri block" id="next">${t("next")} ›</button>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("home");
+ wrap.querySelector("#next").onclick=()=>{
+   insp.customer=val("customer");insp.address=val("address");insp.city=val("city");save();go("snapshot",{inspId:insp.id});
+ };
+ return wrap;
+}
+/* ---- snapshot ---- */
+function viewSnapshot(){
+ const insp=currentInsp();const s=insp.snapshot;
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("back")}</button>
+   <h1>${t("sysOverview")}</h1>
+   <div class="card stack">
+     <div class="grid2">
+       <div><label class="f">${t("brand")}</label>
+         <select class="t" id="brand">${["","Hunter","Rain Bird","Weathermatic","Toro","Other"].map(o=>`<option ${s.brand===o?"selected":""}>${o}</option>`).join("")}</select></div>
+       <div><label class="f">${t("model")}</label><input class="t" id="model" value="${esc(s.model)}" placeholder="X-Core"></div>
+     </div>
+     <div><label class="f">${t("stations")}</label><input class="t" id="stations" type="number" min="0" max="48" value="${esc(s.stations)}" placeholder="8">
+       <div class="note" id="zn">${t("createsZones")}</div></div>
+     <div class="grid2">
+       <div><label class="f">${t("backflow")}</label>
+         <select class="t" id="backflow">${["","PVB","DCV","None"].map(o=>`<option ${s.backflow===o?"selected":""}>${o}</option>`).join("")}</select></div>
+       <div><label class="f">${t("pressure")}</label><input class="t" id="pressure" type="number" value="${esc(s.pressure)}" placeholder="65"></div>
+     </div>
+     <div><label class="f">${t("rainSensor")}</label>
+       <div class="pillbar"><button class="chip ${s.rainSensor==="yes"?"on":""}" data-rs="yes">${t("yes")}</button><button class="chip ${s.rainSensor==="no"?"on":""}" data-rs="no">${t("no")}</button></div></div>
+   </div>
+   <button class="btn pri block" id="next">${t("saveNext")} ›</button>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("newJob",{inspId:insp.id});
+ const stEl=wrap.querySelector("#stations");
+ const upd=()=>{const n=parseInt(stEl.value||"0");wrap.querySelector("#zn").textContent=(n>0?n+" ":"")+t("createsZones");};
+ stEl.oninput=upd;upd();
+ wrap.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{s.rainSensor=b.dataset.rs;save();go("snapshot",{inspId:insp.id});});
+ wrap.querySelector("#next").onclick=()=>{
+   s.brand=val("brand");s.model=val("model");s.stations=val("stations");s.backflow=val("backflow");s.pressure=val("pressure");
+   const n=parseInt(s.stations||"0");
+   const existing=insp.zones.length;
+   if(n>existing){for(let i=existing;i<n;i++)insp.zones.push({n:i+1,waters:[],heads:[],schedule:""});}
+   if(n<existing&&n>=0){insp.zones=insp.zones.slice(0,n);}
+   save();go("zones",{inspId:insp.id});
+ };
+ return wrap;
+}
+/* ---- zones hub ---- */
+function viewZones(){
+ const insp=currentInsp();
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("back")}</button>
+   <h1>${t("zonesHub")} <span style="color:var(--muted);font-weight:400">(${insp.zones.length})</span></h1>
+   <p class="sub">${insp.customer||"—"}</p>
+   <div class="card"><div class="list" id="zlist"></div></div>
+   <button class="btn block" id="sys">＋ ${t("addSysIssue")}</button>
+   <button class="btn amber block" id="rev" style="margin-top:10px">${t("reviewPrice")} ›</button>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("snapshot",{inspId:insp.id});
+ const zl=wrap.querySelector("#zlist");
+ if(!insp.zones.length)zl.appendChild(el(`<div class="empty">${t("createsZones")}</div>`));
+ insp.zones.forEach(z=>{
+   const st=zoneStatus(insp,z);
+   let badge=`<span class="badge gray">${t("notStarted")}</span>`;
+   if(st.k==="issues")badge=`<span class="badge new">${st.n} ${st.n===1?t("hasIssues"):t("hasIssuesP")}</span>`;
+   else if(st.k==="clean")badge=`<span class="badge done">✓ ${t("clean")}</span>`;
+   const it=el(`<div class="item"><div class="g"><div class="n">${t("zone")} ${z.n}</div>
+     <div class="m">${z.waters.map(w=>t(w)).join(", ")||"—"}</div></div>${badge}</div>`);
+   it.onclick=()=>go("zone",{inspId:insp.id,zn:z.n});
+   zl.appendChild(it);
+ });
+ wrap.querySelector("#sys").onclick=()=>go("addIssue",{inspId:insp.id,zn:"system"});
+ wrap.querySelector("#rev").onclick=()=>go("review",{inspId:insp.id});
+ return wrap;
+}
+/* ---- zone detail ---- */
+function viewZone(){
+ const insp=currentInsp();const z=insp.zones.find(x=>x.n===VIEW.zn);
+ z._visited=true;
+ const wat=["turf","beds"];const heads=["spray","rotor","drip","bubbler"];
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("zonesHub")}</button>
+   <h1>${t("zone")} ${z.n}</h1>
+   <div class="card">
+     <label class="f">${t("makeup")}</label><div class="pillbar" id="wat"></div>
+     <label class="f">${t("headTypes")}</label><div class="pillbar" id="hd"></div>
+     <label class="f">${t("sched")}</label><input class="t" id="sched" value="${esc(z.schedule)}" placeholder="${t("schedPh")}">
+   </div>
+   <div class="sechead"><h2 style="margin-bottom:8px">${t("issuesHere")}</h2></div>
+   <div class="card"><div class="list" id="ilist"></div></div>
+   <button class="btn pri block" id="add">＋ ${t("addIssue")}</button>
+   <button class="btn block ghost" id="done" style="margin-top:8px">${t("done")}</button>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>{z.schedule=val("sched");save();go("zones",{inspId:insp.id});};
+ const wEl=wrap.querySelector("#wat");
+ wat.forEach(w=>{const b=el(`<button class="chip ${z.waters.includes(w)?"on":""}">${t(w)}</button>`);b.onclick=()=>{toggle(z.waters,w);save();render();};wEl.appendChild(b);});
+ const hEl=wrap.querySelector("#hd");
+ heads.forEach(h=>{const b=el(`<button class="chip ${z.heads.includes(h)?"on":""}">${t(h)}</button>`);b.onclick=()=>{toggle(z.heads,h);save();render();};hEl.appendChild(b);});
+ const il=wrap.querySelector("#ilist");
+ const zi=insp.lines.filter(l=>l.kind==="issue"&&l.zone===z.n);
+ if(!zi.length)il.appendChild(el(`<div class="empty" style="padding:18px">${t("noIssues")}</div>`));
+ zi.forEach(line=>{const r=priceLine(line);const d=catIssue(line.issueId);
+   const it=el(`<div class="item"><div class="g"><div class="n"><span class="sev ${d.severity}"></span>${nm(d.name)} ×${line.count}</div>
+     <div class="m">${r.detail}</div></div><div class="money">${money(r.price)}</div></div>`);
+   it.onclick=()=>{if(me().canPrice||true){/*view only*/}};
+   il.appendChild(it);});
+ wrap.querySelector("#add").onclick=()=>{z.schedule=val("sched");save();go("addIssue",{inspId:insp.id,zn:z.n});};
+ wrap.querySelector("#done").onclick=()=>{z.schedule=val("sched");save();go("zones",{inspId:insp.id});};
+ return wrap;
+}
+/* ---- add issue ---- */
+function viewAddIssue(){
+ const insp=currentInsp();const isSystem=VIEW.zn==="system";
+ const state={issueId:"",attrVal:"",count:1,severity:"",action:"",photo:null};
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("back")}</button>
+   <h1>${t("addIssue")}</h1>
+   <p class="sub">${isSystem?t("systemWide"):t("zone")+" "+VIEW.zn}</p>
+   <div class="card stack">
+     <div><label class="f">${t("pickIssue")}</label><select class="t" id="issue"><option value=""></option>
+       ${DB.catalog.issues.map(i=>`<option value="${i.id}">${nm(i.name)}</option>`).join("")}</select></div>
+     <div id="attrBox"></div>
+     <div class="grid2">
+       <div><label class="f">${t("count")}</label><input class="t" id="count" type="number" min="1" value="1"></div>
+       <div><label class="f">${t("severity")}</label><select class="t" id="sev">
+         <option value="safety">${t("safety")}</option><option value="functional">${t("functional")}</option><option value="efficiency">${t("efficiency")}</option></select></div>
+     </div>
+     <div><label class="f">${t("repair")} / ${t("replace")}</label>
+       <div class="pillbar"><button type="button" class="chip" data-act="repair">${t("repair")}</button><button type="button" class="chip" data-act="replace">${t("replace")}</button></div></div>
+     <div><label class="f">${t("photo")}</label>
+       <label class="btn sm ghost" style="display:inline-flex"><input type="file" accept="image/*" capture="environment" id="photo" style="display:none">📷 ${t("addPhoto")}</label>
+       <span id="thumbWrap"></span></div>
+   </div>
+   <div id="pricePop"></div>
+   <button class="btn amber block" id="save" style="margin-top:12px" disabled>${t("saveIssue")}</button>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go(isSystem?"zones":"zone",isSystem?{inspId:insp.id}:{inspId:insp.id,zn:VIEW.zn});
+ const issueSel=wrap.querySelector("#issue");
+ const attrBox=wrap.querySelector("#attrBox");
+ const sevSel=wrap.querySelector("#sev");
+ const countEl=wrap.querySelector("#count");
+ const pop=wrap.querySelector("#pricePop");
+ const saveBtn=wrap.querySelector("#save");
+ function refreshPrice(){
+   if(!state.issueId){pop.innerHTML="";saveBtn.disabled=true;return;}
+   const line={kind:"issue",issueId:state.issueId,attrVal:state.attrVal,count:state.count};
+   const r=priceLine(line);
+   pop.innerHTML=`<div class="price-pop"><span class="lbl">${t("estAppears")}${r.detail?" · "+r.detail:""}</span><span class="amt">${money(r.price)}</span></div>`;
+   const needAttr=(()=>{const d=catIssue(state.issueId);return d&&d.attr&&!state.attrVal;})();
+   saveBtn.disabled=needAttr;
+ }
+ issueSel.onchange=()=>{
+   state.issueId=issueSel.value;state.attrVal="";
+   const d=catIssue(state.issueId);
+   attrBox.innerHTML="";
+   if(d){
+     sevSel.value=d.severity;state.severity=d.severity;state.action=d.action;
+     wrap.querySelectorAll("[data-act]").forEach(b=>b.classList.toggle("on",b.dataset.act===d.action));
+     if(d.attr){
+       const box=el(`<div><label class="f">${nm(d.attr.name)}</label><div class="pillbar" id="attrPills"></div></div>`);
+       const pills=box.querySelector("#attrPills");
+       d.attr.options.forEach(o=>{const b=el(`<button type="button" class="chip">${nm(o.label)}</button>`);
+         b.onclick=()=>{state.attrVal=o.val;box.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));b.classList.add("on");refreshPrice();};
+         pills.appendChild(b);});
+       attrBox.appendChild(box);
+     }
+   }
+   refreshPrice();
+ };
+ sevSel.onchange=()=>state.severity=sevSel.value;
+ countEl.oninput=()=>{state.count=Math.max(1,parseInt(countEl.value||"1"));refreshPrice();};
+ wrap.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{state.action=b.dataset.act;wrap.querySelectorAll("[data-act]").forEach(x=>x.classList.toggle("on",x===b));});
+ wrap.querySelector("#photo").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{state.photo=rd.result;wrap.querySelector("#thumbWrap").innerHTML=`<img class="thumb" src="${state.photo}" style="margin-left:8px;vertical-align:middle">`;};rd.readAsDataURL(f);};
+ saveBtn.onclick=()=>{
+   insp.lines.push({id:uid(),kind:"issue",issueId:state.issueId,attrVal:state.attrVal,count:state.count,
+     severity:state.severity,action:state.action,photo:state.photo,zone:isSystem?"system":VIEW.zn,state:"on"});
+   save();go(isSystem?"zones":"zone",isSystem?{inspId:insp.id}:{inspId:insp.id,zn:VIEW.zn});
+ };
+ return wrap;
+}
+/* ---- review / quote ---- */
+function viewReview(){
+ const insp=currentInsp();const u=me();const canPrice=u.canPrice||u.role==="admin";
+ const tot=inspTotals(insp);
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("zonesHub")}</button>
+   <h1>${t("review")}</h1>
+   <p class="sub">${insp.customer||"—"} · ${insp.address||""}</p>
+   ${renderGroup(insp,"on",t("onQuote"))}
+   <div class="pillbar noprint" style="margin-top:6px">
+     <button class="chip" data-add="part">＋ ${t("addPart")}</button>
+     <button class="chip" data-add="labor">＋ ${t("addLabor")}</button>
+     <button class="chip" data-add="assembly">＋ ${t("addAssembly")}</button>
+     <button class="chip" data-add="local">＋ ${t("addLocal")}</button>
+   </div>
+   ${renderGroup(insp,"deferred",t("deferredH"))}
+   ${renderGroup(insp,"declined",t("declinedH"))}
+   <div class="card" style="margin-top:14px">
+     ${canPrice?`<div class="tot"><span>${t("parts")}</span><span class="money">${money(tot.parts)}</span></div>
+     <div class="tot"><span>${t("laborL")}</span><span class="money">${money(tot.labor)}</span></div>
+     <div class="tot"><span>${t("cost")}</span><span class="money">${money(tot.cost)}</span></div>
+     <div class="tot"><span>${t("margin")}</span><span class="money">${Math.round(tot.margin*100)}%</span></div>`:""}
+     <div class="tot big"><span>${t("total")}</span><span class="money">${money(tot.price)}</span></div>
+   </div>
+   ${insp.status==="approved"
+     ?`<div class="card noprint" style="text-align:center;background:#e3ede8;border-color:#c7ddd2"><b style="color:var(--pine)">✓ ${t("approved")}</b></div>
+       <button class="btn pri block" id="print">${t("printQuote")}</button>
+       <button class="btn block ghost" id="reopen" style="margin-top:8px;color:var(--muted)">${t("sendBack")}</button>`
+     :`<button class="btn pri block" id="approve">${t("approve")}</button>
+       <button class="btn block ghost" id="print" style="margin-top:8px">${t("printQuote")}</button>`}
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("zones",{inspId:insp.id});
+ wrap.querySelectorAll("[data-line]").forEach(b=>b.onclick=()=>openLineMenu(insp,b.dataset.line));
+ wrap.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>openAddLine(insp,b.dataset.add));
+ const ap=wrap.querySelector("#approve");if(ap)ap.onclick=()=>{insp.status="approved";save();go("review",{inspId:insp.id});};
+ const ro=wrap.querySelector("#reopen");if(ro)ro.onclick=()=>{insp.status="draft";save();go("review",{inspId:insp.id});};
+ const pr=wrap.querySelector("#print");if(pr)pr.onclick=()=>go("print",{inspId:insp.id});
+ return wrap;
+}
+function renderGroup(insp,stateKey,title){
+ const lines=insp.lines.filter(l=>l.state===stateKey);
+ if(!lines.length&&stateKey!=="on")return"";
+ let html=`<h2>${title}</h2><div class="card">`;
+ if(!lines.length){html+=`<div class="empty" style="padding:16px">${t("noIssues")}</div>`;}
+ lines.forEach(line=>{const r=priceLine(line);const zlabel=line.zone?(line.zone==="system"?t("systemWide"):t("zone")+" "+line.zone):"";
+   const off=stateKey!=="on"?"off":"";
+   html+=`<div class="qline ${off}"><div class="g"><div class="n">${lineName(line)}${line.count>1?" ×"+line.count:""}</div>
+     <div class="m">${[zlabel,r.detail].filter(Boolean).join(" · ")}</div></div>
+     <div class="p">${money(r.price)}</div>
+     <button class="dots noprint" data-line="${line.id}">⋯</button></div>`;
+ });
+ html+=`</div>`;
+ return html;
+}
+function openLineMenu(insp,lineId){
+ const line=insp.lines.find(l=>l.id===lineId);if(!line)return;
+ const opts=[];
+ if(line.state!=="on")opts.push(["on",t("moveOnQuote")]);
+ if(line.state!=="deferred")opts.push(["deferred",t("moveDefer")]);
+ if(line.state!=="declined")opts.push(["declined",t("moveDecline")]);
+ SHEET=el(`<div class="menu"><div class="sheet">
+   ${opts.map(o=>`<button data-s="${o[0]}">${o[1]}</button>`).join("")}
+   <button class="dz" data-del="1">${t("remove")}</button>
+   <button data-cancel="1" style="color:var(--muted)">${t("cancel")}</button>
+ </div></div>`);
+ SHEET.onclick=e=>{if(e.target.classList.contains("menu")){SHEET=null;render();}};
+ SHEET.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{line.state=b.dataset.s;save();SHEET=null;go("review",{inspId:insp.id});});
+ SHEET.querySelector("[data-del]").onclick=()=>{insp.lines=insp.lines.filter(l=>l.id!==lineId);save();SHEET=null;go("review",{inspId:insp.id});};
+ SHEET.querySelector("[data-cancel]").onclick=()=>{SHEET=null;render();};
+ render();
+}
+function openAddLine(insp,kind){
+ let body="";
+ if(kind==="part")body=`<select class="t" id="ref">${DB.catalog.parts.map(p=>`<option value="${p.id}">${nm(p.name)} — ${money(p.price)}</option>`).join("")}</select><label class="f">${t("qty")}</label><input class="t" id="qty" type="number" min="1" value="1">`;
+ if(kind==="labor")body=`<select class="t" id="ref">${DB.catalog.labor.map(l=>`<option value="${l.id}">${nm(l.name)} — ${money(l.rate)}${l.unit==="hour"?"/hr":""}</option>`).join("")}</select><label class="f">${t("qty")}</label><input class="t" id="qty" type="number" min="1" value="1" step="0.25">`;
+ if(kind==="assembly")body=`<select class="t" id="ref">${DB.catalog.assemblies.map(a=>`<option value="${a.id}">${nm(a.name)} — ${money(a.price)}</option>`).join("")}</select><label class="f">${t("qty")}</label><input class="t" id="qty" type="number" min="1" value="1">`;
+ if(kind==="local")body=`<label class="f">${t("name")}</label><input class="t" id="lname" placeholder="${t("local")}"><label class="f">${t("priceEach")}</label><input class="t" id="lprice" type="number" min="0" value="0">`;
+ SHEET=el(`<div class="menu"><div class="sheet" style="padding:16px">
+   <h2 style="margin-top:0">＋ ${t(kind==="part"?"addPart":kind==="labor"?"addLabor":kind==="assembly"?"addAssembly":"addLocal")}</h2>
+   ${body}
+   <button class="btn pri block" id="ok" style="margin-top:14px">${t("addLine")}</button>
+   <button class="btn block ghost" id="cx" style="margin-top:8px;color:var(--muted)">${t("cancel")}</button>
+ </div></div>`);
+ SHEET.onclick=e=>{if(e.target.classList.contains("menu")){SHEET=null;render();}};
+ SHEET.querySelector("#cx").onclick=()=>{SHEET=null;render();};
+ SHEET.querySelector("#ok").onclick=()=>{
+   let line={id:uid(),state:"on",count:1};
+   if(kind==="local"){line.kind="local";line.name=SHEET.querySelector("#lname").value||t("local");line.price=parseFloat(SHEET.querySelector("#lprice").value||"0");line.cost=line.price;}
+   else{line.kind=kind;line.refId=SHEET.querySelector("#ref").value;line.count=parseFloat(SHEET.querySelector("#qty").value||"1");}
+   insp.lines.push(line);save();SHEET=null;go("review",{inspId:insp.id});
+ };
+ render();
+}
+/* ---- print quote ---- */
+function viewPrint(){
+ const insp=currentInsp();const tot=inspTotals(insp);
+ const onLines=insp.lines.filter(l=>l.state==="on");
+ const defLines=insp.lines.filter(l=>l.state==="deferred");
+ const wrap=el(`<div>
+   <div class="noprint" style="display:flex;gap:10px;margin-bottom:14px">
+     <button class="btn ghost" id="bk">‹ ${t("back")}</button>
+     <button class="btn pri" id="pr" style="flex:1">${t("printQuote")}</button>
+   </div>
+   <div style="text-align:center;margin-bottom:6px">
+     <div style="font-size:20px;font-weight:800;color:var(--pine)">💧 Sergio's Landscaping</div>
+     <div style="font-size:12px;color:var(--muted)">Commercial & Residential · Conroe, TX · 936-788-1219</div>
+   </div>
+   <div style="display:flex;justify-content:space-between;font-size:13px;margin:14px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);padding:10px 0">
+     <div><b>${t("quoteFor")}:</b> ${esc(insp.customer)}<br>${esc(insp.address)} ${esc(insp.city)}</div>
+     <div style="text-align:right"><b>${t("dateL")}:</b> ${insp.date}<br><b>${t("techL")}:</b> ${esc(insp.tech)}</div>
+   </div>
+   <table style="width:100%;border-collapse:collapse;font-size:14px">
+     <thead><tr style="text-align:left;color:var(--muted);font-size:12px">
+       <th style="padding:6px 0">${t("name")}</th><th style="text-align:right">${t("priceEach")}</th></tr></thead>
+     <tbody>
+     ${onLines.map(line=>{const r=priceLine(line);const z=line.zone?(line.zone==="system"?t("systemWide"):t("zone")+" "+line.zone):"";
+       return `<tr style="border-top:1px solid var(--line)"><td style="padding:9px 0"><b>${lineName(line)}</b>${line.count>1?" ×"+line.count:""}<br><span style="color:var(--muted);font-size:12px">${[z,r.detail].filter(Boolean).join(" · ")}</span></td>
+       <td style="text-align:right" class="money">${money(r.price)}</td></tr>`;}).join("")}
+     </tbody>
+   </table>
+   <div class="tot big" style="margin-top:12px"><span>${t("total")}</span><span class="money">${money(tot.price)}</span></div>
+   ${defLines.length?`<div style="margin-top:20px;font-size:13px"><b>${t("futureNote")}</b><ul style="margin:6px 0;padding-left:18px;color:var(--muted)">
+      ${defLines.map(l=>`<li>${lineName(l)}${l.count>1?" ×"+l.count:""}</li>`).join("")}</ul></div>`:""}
+   <div style="margin-top:30px;border-top:1px solid var(--line);padding-top:20px">
+     <div style="height:44px;border-bottom:1px solid var(--ink);margin-bottom:6px"></div>
+     <div style="font-size:12px;color:var(--muted)">${t("sig")} — ${t("signHint")}</div>
+   </div>
+   <div style="text-align:center;margin-top:24px;font-size:12px;color:var(--muted)">${t("thankyou")}</div>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("review",{inspId:insp.id});
+ wrap.querySelector("#pr").onclick=()=>window.print();
+ return wrap;
+}
+/* ---- catalog (admin) ---- */
+function viewCatalog(){
+ const tab=VIEW.tab||"parts";
+ const wrap=el(`<div>
+   <button class="backlink" id="bk">‹ ${t("back")}</button>
+   <h1>${t("catTitle")}</h1>
+   <p class="sub">${t("adminOnly")}</p>
+   <div class="pillbar">
+     ${[["parts","tabParts"],["labor","tabLabor"],["assemblies","tabAssm"],["issues","tabIssues"]].map(x=>`<button class="chip ${tab===x[0]?"on":""}" data-tab="${x[0]}">${t(x[1])}</button>`).join("")}
+   </div>
+   <div id="body"></div>
+ </div>`);
+ wrap.querySelector("#bk").onclick=()=>go("home");
+ wrap.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go("catalog",{tab:b.dataset.tab}));
+ const body=wrap.querySelector("#body");
+ if(tab==="parts"){
+   DB.catalog.parts.forEach(p=>{
+     const c=el(`<div class="card" style="padding:12px 14px">
+       <div style="font-weight:600">${nm(p.name)} <span style="color:var(--muted);font-weight:400;font-size:12px">${p.brand||""} ${p.sku?"· "+p.sku:""}</span></div>
+       <div class="grid2" style="margin-top:8px">
+         <div><label class="f" style="margin-top:0">${t("unitCost")}</label><input class="t" data-cost="${p.id}" type="number" value="${p.cost}"></div>
+         <div><label class="f" style="margin-top:0">${t("sellPrice")}</label><input class="t" data-price="${p.id}" type="number" value="${p.price}"></div>
+       </div></div>`);
+     body.appendChild(c);
+   });
+   const savebar=el(`<button class="btn pri block" id="savecat">${t("save")}</button>`);
+   savebar.onclick=()=>{DB.catalog.parts.forEach(p=>{const c=body.querySelector(`[data-cost="${p.id}"]`);const pr=body.querySelector(`[data-price="${p.id}"]`);if(c)p.cost=parseFloat(c.value||"0");if(pr)p.price=parseFloat(pr.value||"0");});save();flash(t("edited"));};
+   body.appendChild(savebar);
+ }
+ if(tab==="labor"){
+   DB.catalog.labor.forEach(l=>{
+     const c=el(`<div class="card" style="padding:12px 14px;display:flex;align-items:center;gap:12px">
+       <div style="flex:1"><div style="font-weight:600">${nm(l.name)}</div><div class="m" style="font-size:12px;color:var(--muted)">${l.unit}</div></div>
+       <div style="width:110px"><input class="t" data-rate="${l.id}" type="number" value="${l.rate}"></div></div>`);
+     body.appendChild(c);
+   });
+   const sb=el(`<button class="btn pri block" id="sl">${t("save")}</button>`);
+   sb.onclick=()=>{DB.catalog.labor.forEach(l=>{const r=body.querySelector(`[data-rate="${l.id}"]`);if(r)l.rate=parseFloat(r.value||"0");});save();flash(t("edited"));};
+   body.appendChild(sb);
+ }
+ if(tab==="assemblies"){
+   DB.catalog.assemblies.forEach(a=>{
+     const rec=a.recipe.map(r=>{const it=r.kind==="part"?catPart(r.id):catLabor(r.id);return `${r.qty}× ${it?nm(it.name):r.id}`;}).join(" · ");
+     const c=el(`<div class="card">
+       <div style="display:flex;justify-content:space-between;align-items:center">
+         <div style="font-weight:600">${nm(a.name)}</div><div class="money" style="font-size:18px">${money(a.price)}</div></div>
+       <div class="note">${t("recipe")}: ${rec}</div>
+       <div class="m" style="font-size:12px;color:var(--muted);margin-top:6px">${a.rolled?t("rolled"):""}</div></div>`);
+     body.appendChild(c);
+   });
+ }
+ if(tab==="issues"){
+   DB.catalog.issues.forEach(i=>{
+     const fixParts=[];if(i.partId){const p=catPart(i.partId);if(p)fixParts.push(nm(p.name));}
+     if(i.attr)fixParts.push(nm(i.attr.name)+" →");if(i.laborId){const l=catLabor(i.laborId);if(l)fixParts.push(nm(l.name));}
+     const c=el(`<div class="card" style="padding:12px 14px">
+       <div style="font-weight:600"><span class="sev ${i.severity}"></span>${nm(i.name)}</div>
+       <div class="m" style="font-size:12px;color:var(--muted);margin-top:4px">${t(i.action)} · ${fixParts.join(" + ")||"labor"}</div></div>`);
+     body.appendChild(c);
+   });
+ }
+ return wrap;
+}
+/* ---- helpers ---- */
+function val(id){const e=document.getElementById(id);return e?e.value:"";}
+function esc(s){return(s==null?"":String(s)).replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+function toggle(arr,v){const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);}
+function flash(msg){const f=el(`<div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:22px;font-size:14px;z-index:99">${msg}</div>`);document.body.appendChild(f);setTimeout(()=>f.remove(),1400);}
+/* ---- boot ---- */
+if(DB.session)go("home");else go("login");
+</script>
+</body>
+</html>

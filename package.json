@@ -1,0 +1,31 @@
+{
+  "name": "sergios-irrigation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sergio's Landscaping — irrigation inspection-to-quote app",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:seed": "tsx scripts/seed-db.ts"
+  },
+  "dependencies": {
+    "next": "15.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "bcryptjs": "2.4.3",
+    "jose": "5.9.6",
+    "postgres": "3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.6",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "@types/bcryptjs": "2.4.6",
+    "tsx": "4.19.2",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}
