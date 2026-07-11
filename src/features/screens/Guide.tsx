@@ -17,8 +17,20 @@ const GUIDE = {
       p: "1. Submitted inspections appear in the Queue.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin.\n3. Approve → creates a work order.\n4. Start work, then Mark complete and capture the customer's completion signature.\n5. Print the branded proposal at any point. Billing after completion is handled by the office, outside the app.",
     },
     {
+      h: "Customers & job history",
+      p: "Open Customers from the menu to browse everyone in the database, searchable by name or address. Tap a customer to see their job history — every past inspection and work order at that property, with the date, status, what was found, and the total. Tap any past job to see the full detail (parts and labor used). Start a new inspection right from the customer. Admins can remove a customer added by mistake.",
+    },
+    {
+      h: "Address & site map",
+      p: "On a new inspection, start typing the address to pick it from Google, or tap “Use my location” to fill it from GPS. From the Zones hub, open the Site map to see the property from above: pick a zone, draw its coverage, and drop sprinkler pins. Tap a shape or pin to select it, then Remove. Save the map — it warns you if you leave with unsaved changes.",
+    },
+    {
       h: "Roles & permissions",
       p: "Field tech (capture), Office (pricing), Admin (everything, incl. the approval gate). Permissions are individual switches: see prices, set/override prices, manage catalog, and approve work orders. Manage people under Team.",
+    },
+    {
+      h: "Fixing mistakes",
+      p: "Backing out of a brand-new inspection before entering anything leaves nothing behind. Admins can permanently delete an inspection/quote from the Review screen or the Queue, and remove a customer from the Customers screen. Every destructive action asks you to confirm first.",
     },
     {
       h: "Catalog",
@@ -43,8 +55,20 @@ const GUIDE = {
       p: "1. Las inspecciones enviadas aparecen en la Cola.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen.\n3. Aprobar → crea una orden de trabajo.\n4. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n5. Imprime la propuesta con marca en cualquier momento. La facturación posterior la maneja la oficina, fuera de la app.",
     },
     {
+      h: "Clientes e historial",
+      p: "Abre Clientes desde el menú para ver a todos en la base de datos, con búsqueda por nombre o dirección. Toca un cliente para ver su historial — cada inspección y orden de trabajo en esa propiedad, con la fecha, el estado, lo que se encontró y el total. Toca cualquier trabajo pasado para ver el detalle completo (piezas y mano de obra usadas). Inicia una nueva inspección desde el cliente. Los admins pueden eliminar un cliente agregado por error.",
+    },
+    {
+      h: "Dirección y mapa del sitio",
+      p: "En una nueva inspección, escribe la dirección para elegirla de Google, o toca “Usar mi ubicación” para llenarla por GPS. Desde las Zonas, abre el Mapa del sitio para ver la propiedad desde arriba: elige una zona, dibuja su cobertura y coloca aspersores. Toca una forma o pin para seleccionarlo, luego Eliminar. Guarda el mapa — te avisa si sales con cambios sin guardar.",
+    },
+    {
       h: "Roles y permisos",
       p: "Técnico de campo (captura), Oficina (cotización), Admin (todo, incl. la aprobación). Los permisos son interruptores: ver precios, fijar/cambiar precios, administrar catálogo y aprobar órdenes. Administra personas en Equipo.",
+    },
+    {
+      h: "Corregir errores",
+      p: "Si sales de una inspección nueva antes de capturar algo, no queda nada guardado. Los admins pueden eliminar de forma permanente una inspección/cotización desde Revisar o la Cola, y quitar un cliente desde la pantalla de Clientes. Toda acción destructiva pide confirmación primero.",
     },
     {
       h: "Catálogo",

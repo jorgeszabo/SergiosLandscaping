@@ -27,8 +27,9 @@ the top bar. In demo mode (before a database is connected) any password works.
 
 ## Field tech — capturing an inspection
 
-1. **New inspection** (the ＋ button). Choose an existing customer or type a new
-   one, add the address.
+1. **New inspection** (the ＋ button). Type a name to **search existing
+   customers**, or enter a new one. Start typing the address to **pick it from
+   Google**, or tap **Use my location** to fill it from GPS.
 2. **System overview** — controller brand/model, backflow, static pressure, rain
    sensor. The **number of stations creates that many zones** automatically.
 3. **Zones** is home base. Open each zone and:
@@ -37,7 +38,10 @@ the top bar. In demo mode (before a database is connected) any password works.
      → set the count and severity → add a **photo**. A **price appears
      automatically**.
 4. Add **system-wide issues** (controller, backflow, pressure) from the hub.
-5. Tap **Review & price**. Have the **customer sign** to approve the estimate,
+5. Optional: open the **Site map** from the Zones hub to see the property from
+   above — pick a zone, **draw its coverage**, and drop **sprinkler pins**. Tap a
+   shape or pin to select it, then **Remove**. **Save map** when done.
+6. Tap **Review & price**. Have the **customer sign** to approve the estimate,
    then **Submit for review**.
 
 Prices can be hidden per person (a tech without the "see prices" permission
@@ -61,6 +65,32 @@ Billing after a job is completed is handled by the office, outside the app.
 
 **Lifecycle:** draft → (customer signs) submitted → under review → approved
 (work order) → in progress → completed.
+
+---
+
+## Customers & job history
+
+Open **Customers** (sidebar on desktop, **More** menu on mobile) to browse
+everyone in the database, searchable by name, address, or city. Tap a customer
+to open their record:
+
+- **Job history** — every past inspection and work order at that property, with
+  the date, status, what was found, and the total. Tap any past job to see the
+  full detail (parts and labor used) — useful for "what did we do here last
+  time?"
+- **New inspection here** — starts a job prefilled with that customer.
+- Admins can **remove** a customer added by mistake (inspections keep their own
+  copy of the name, so nothing is orphaned).
+
+---
+
+## Fixing mistakes & cleanup
+
+- Backing out of a brand-new inspection **before entering anything** leaves no
+  empty entry behind. Anything entered past the first screen is kept as a draft.
+- **Admins can permanently delete** an inspection/quote — from the **Review**
+  screen or the trash icon on a **Queue** row — to clear tests and mistakes.
+- Every **destructive action asks you to confirm** first.
 
 ---
 

@@ -20,6 +20,7 @@ import { Catalog } from "./screens/Catalog";
 import { Office } from "./screens/Office";
 import { Team } from "./screens/Team";
 import { Customers } from "./screens/Customers";
+import { CustomerDetail } from "./screens/CustomerDetail";
 import { Guide } from "./screens/Guide";
 import { SiteMap } from "./screens/SiteMap";
 
@@ -122,6 +123,8 @@ function Screen() {
       return <Team />;
     case "customers":
       return <Customers />;
+    case "customer":
+      return <CustomerDetail />;
     case "guide":
       return <Guide />;
     case "map":
