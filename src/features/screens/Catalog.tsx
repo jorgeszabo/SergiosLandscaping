@@ -6,13 +6,35 @@ import { useToast } from "@/components/Toast";
 import { useNav } from "../nav";
 import { money, findPart, findLabor, nm as engineNm } from "@/lib/money/engine";
 import { uid } from "@/lib/data/id";
+import { SEED_CATALOG } from "@/lib/data/seed";
 import { IconSearch, IconChevronRight, IconChevronLeft, IconPlus, IconTrash } from "@/components/icons";
 import type {
-  Assembly, Catalog as CatalogT, IssueType, LaborRate, Part, Severity, Unit,
+  Assembly, Catalog as CatalogT, IssueType, Lang, LaborRate, Part, Severity, Unit,
 } from "@/lib/data/types";
 
 type Tab = "parts" | "labor" | "assemblies" | "issues";
 type EditItem = Part | LaborRate | Assembly | IssueType;
+
+// Component-type groups for the parts list, in display order, with bilingual
+// labels. Unknown/custom categories fall back to the raw string.
+const CATEGORY_ORDER = [
+  "Controller", "Valve", "Spray Head", "Spray Nozzle", "Rotor", "Drip",
+  "Backflow", "Sensor", "Pipe & Fittings", "Wire & Electrical", "Valve Box", "Consumables",
+];
+const CATEGORY_LABELS: Record<string, { en: string; es: string }> = {
+  Controller: { en: "Controllers", es: "Controladores" },
+  Valve: { en: "Valves", es: "Válvulas" },
+  "Spray Head": { en: "Spray heads", es: "Aspersores emergentes" },
+  "Spray Nozzle": { en: "Spray nozzles", es: "Boquillas" },
+  Rotor: { en: "Rotors", es: "Rotores" },
+  Drip: { en: "Drip", es: "Goteo" },
+  Backflow: { en: "Backflow", es: "Antisifón" },
+  Sensor: { en: "Sensors", es: "Sensores" },
+  "Pipe & Fittings": { en: "Pipe & fittings", es: "Tubería y conexiones" },
+  "Wire & Electrical": { en: "Wire & electrical", es: "Cable y eléctrico" },
+  "Valve Box": { en: "Valve boxes", es: "Cajas de válvula" },
+  Consumables: { en: "Consumables", es: "Consumibles" },
+};
 
 const blankPart = (): Part => ({ id: "part_" + uid(), name: { en: "", es: "" }, unit: "each", cost: 0, price: 0, onHand: true });
 const blankLabor = (): LaborRate => ({ id: "labor_" + uid(), name: { en: "", es: "" }, unit: "hour", rate: 0 });
@@ -28,8 +50,27 @@ export function Catalog() {
 
   const [draft, setDraft] = useState<CatalogT>(() => structuredClone(db.catalog));
   const [q, setQ] = useState("");
+  const [catFilter, setCatFilter] = useState<string>("all");
   const [edit, setEdit] = useState<EditItem | null>(null);
   const [isNew, setIsNew] = useState(false);
+  const catLabel = (cat: string) =>
+    cat === "__unc" ? t("catUncategorized") : CATEGORY_LABELS[cat]?.[lang as Lang] ?? cat;
+
+  const loadStarter = async () => {
+    const mergeById = <T extends { id: string }>(cur: T[], seed: T[]): T[] => {
+      const ids = new Set(cur.map((x) => x.id));
+      return [...cur, ...seed.filter((s) => !ids.has(s.id))];
+    };
+    const next: CatalogT = {
+      parts: mergeById(draft.parts, SEED_CATALOG.parts),
+      labor: mergeById(draft.labor, SEED_CATALOG.labor),
+      assemblies: mergeById(draft.assemblies, SEED_CATALOG.assemblies),
+      issues: mergeById(draft.issues, SEED_CATALOG.issues),
+    };
+    setDraft(next);
+    await saveCatalog(next);
+    toast(t("starterLoaded"));
+  };
 
   const persist = async (next: CatalogT) => {
     setDraft(next);
@@ -123,13 +164,30 @@ export function Catalog() {
       });
   })();
 
+  // Parts grouped by component type (category), for the friendlier list.
+  const catOf = (p: Part) => p.category || "__unc";
+  const partMatches = draft.parts.filter(
+    (p) => match(p.name.en) || match(p.name.es) || match(p.brand || "") || match(p.sku || "")
+  );
+  const presentCats = [
+    ...CATEGORY_ORDER,
+    ...draft.parts.map(catOf).filter((c) => c !== "__unc" && !CATEGORY_ORDER.includes(c)),
+  ]
+    .filter((c, i, a) => a.indexOf(c) === i)
+    .filter((c) => draft.parts.some((p) => catOf(p) === c));
+  const filterCats = [...presentCats, ...(draft.parts.some((p) => catOf(p) === "__unc") ? ["__unc"] : [])];
+  const groupCats = catFilter === "all" ? filterCats : [catFilter];
+  const partGroups = groupCats
+    .map((cat) => ({ cat, items: partMatches.filter((p) => catOf(p) === cat) }))
+    .filter((g) => g.items.length > 0);
+
   const TABS: Tab[] = ["parts", "labor", "assemblies", "issues"];
 
   return (
     <div style={{ maxWidth: 760 }}>
       <div className="pillbar">
         {TABS.map((tb) => (
-          <button key={tb} className={`chip ${tab === tb ? "on" : ""}`} onClick={() => { navigate({ name: "catalog", tab: tb }); setQ(""); }}>
+          <button key={tb} className={`chip ${tab === tb ? "on" : ""}`} onClick={() => { navigate({ name: "catalog", tab: tb }); setQ(""); setCatFilter("all"); }}>
             {t(tb === "parts" ? "tabParts" : tb === "labor" ? "tabLabor" : tb === "assemblies" ? "tabAssm" : "tabIssues")}
           </button>
         ))}
@@ -145,22 +203,67 @@ export function Catalog() {
         </button>
       </div>
 
-      <div className="card" style={{ padding: 0, marginTop: 12 }}>
-        <div className="list" style={{ padding: "0 14px" }}>
-          {rows.length === 0 && <div className="empty">{t("nothingHere")}</div>}
-          {rows.map((r) => (
-            <button key={r.id} className="item" onClick={() => openEdit(r.item)}>
-              <div className="g">
-                <div className="n">{r.sev ? <span className={`sev ${r.sev}`} /> : null}{r.title}</div>
-                <div className="m">{r.meta}</div>
-              </div>
-              {r.right && <div className="money">{r.right}</div>}
-              <span style={{ color: "var(--text-muted)" }}><IconChevronRight size={18} /></span>
-            </button>
+      {tab === "parts" && filterCats.length > 1 && (
+        <div className="pillbar" style={{ marginTop: 10 }}>
+          <button className={`chip ${catFilter === "all" ? "on" : ""}`} onClick={() => setCatFilter("all")}>{t("all")}</button>
+          {filterCats.map((c) => (
+            <button key={c} className={`chip ${catFilter === c ? "on" : ""}`} onClick={() => setCatFilter(c)}>{catLabel(c)}</button>
           ))}
         </div>
-      </div>
-      <p className="sub" style={{ marginTop: 10, fontSize: 12.5 }}>{rows.length} {t("itemsCount")}</p>
+      )}
+
+      {tab === "parts" ? (
+        <>
+          <div className="card" style={{ padding: 0, marginTop: 12 }}>
+            {partGroups.length === 0 && <div className="empty">{t("nothingHere")}</div>}
+            {partGroups.map((g) => (
+              <div key={g.cat}>
+                {catFilter === "all" && (
+                  <div className="cathdr">{catLabel(g.cat)} <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>({g.items.length})</span></div>
+                )}
+                <div className="list" style={{ padding: "0 14px" }}>
+                  {g.items.map((p) => (
+                    <button key={p.id} className="item" onClick={() => openEdit(p)}>
+                      <div className="g">
+                        <div className="n">{nm(p.name)}</div>
+                        <div className="m">{[p.brand, p.sku].filter(Boolean).join(" · ")}</div>
+                      </div>
+                      <div className="money">{money(p.price)}</div>
+                      <span style={{ color: "var(--text-muted)" }}><IconChevronRight size={18} /></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="sub" style={{ marginTop: 10, fontSize: 12.5 }}>{partMatches.length} {t("itemsCount")}</p>
+          <div className="note" style={{ marginTop: 4 }}>
+            {t("loadStarterHint")}
+            <div style={{ marginTop: 8 }}>
+              <button className="btn sm" onClick={loadStarter}><IconPlus size={14} /> {t("loadStarter")}</button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="card" style={{ padding: 0, marginTop: 12 }}>
+            <div className="list" style={{ padding: "0 14px" }}>
+              {rows.length === 0 && <div className="empty">{t("nothingHere")}</div>}
+              {rows.map((r) => (
+                <button key={r.id} className="item" onClick={() => openEdit(r.item)}>
+                  <div className="g">
+                    <div className="n">{r.sev ? <span className={`sev ${r.sev}`} /> : null}{r.title}</div>
+                    <div className="m">{r.meta}</div>
+                  </div>
+                  {r.right && <div className="money">{r.right}</div>}
+                  <span style={{ color: "var(--text-muted)" }}><IconChevronRight size={18} /></span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="sub" style={{ marginTop: 10, fontSize: 12.5 }}>{rows.length} {t("itemsCount")}</p>
+        </>
+      )}
     </div>
   );
 }
@@ -175,6 +278,10 @@ function PartFields({ p, set, t }: { p: Part; set: (patch: Partial<Part>) => voi
         <Field label={t("unitCost")}><input className="t" type="number" value={p.cost} onChange={(e) => set({ cost: parseFloat(e.target.value || "0") })} /></Field>
         <Field label={t("sellPrice")}><input className="t" type="number" value={p.price} onChange={(e) => set({ price: parseFloat(e.target.value || "0") })} /></Field>
         <Field label="Unit"><select className="t" value={p.unit} onChange={(e) => set({ unit: e.target.value as Unit })}>{UNITS.map((u) => <option key={u}>{u}</option>)}</select></Field>
+        <Field label={t("catCategory")}>
+          <input className="t" list="catlist" value={p.category || ""} onChange={(e) => set({ category: e.target.value })} />
+          <datalist id="catlist">{CATEGORY_ORDER.map((c) => <option key={c} value={c} />)}</datalist>
+        </Field>
         <Field label="Brand"><input className="t" value={p.brand || ""} onChange={(e) => set({ brand: e.target.value })} /></Field>
         <Field label="SKU"><input className="t" value={p.sku || ""} onChange={(e) => set({ sku: e.target.value })} /></Field>
         <Field label="Vendor"><input className="t" value={p.vendor || ""} onChange={(e) => set({ vendor: e.target.value })} /></Field>
