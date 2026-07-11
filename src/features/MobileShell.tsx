@@ -11,7 +11,7 @@ import { uid } from "@/lib/data/id";
 import type { Inspection } from "@/lib/data/types";
 import {
   IconHome, IconInbox, IconGrid, IconUsers, IconPlus, IconMenu, IconGlobe,
-  IconLogout, IconBook,
+  IconLogout, IconBook, IconBriefcase,
 } from "@/components/icons";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
@@ -76,6 +76,10 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
 
       {more && (
         <Sheet onClose={() => setMore(false)}>
+          <button onClick={() => { setMore(false); navigate({ name: "customers" }); }}>
+            <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconBriefcase size={18} /></span>
+            {t("navCustomers")}
+          </button>
           {isAdmin && (
             <button onClick={() => { setMore(false); navigate({ name: "catalog", tab: "parts" }); }}>
               <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconGrid size={18} /></span>

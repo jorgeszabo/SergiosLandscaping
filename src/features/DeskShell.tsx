@@ -8,7 +8,7 @@ import { ThemePicker } from "./ThemePicker";
 import { uid } from "@/lib/data/id";
 import type { Inspection } from "@/lib/data/types";
 import {
-  IconHome, IconInbox, IconGrid, IconUsers, IconBook, IconPlus, IconGlobe, IconLogout,
+  IconHome, IconInbox, IconGrid, IconUsers, IconBook, IconPlus, IconGlobe, IconLogout, IconBriefcase,
 } from "@/components/icons";
 
 /* Desktop operations shell for office/admin — sidebar + topbar, from the
@@ -24,6 +24,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
   const nav: { id: ViewName; label: string; Icon: typeof IconHome; show: boolean }[] = [
     { id: "home", label: t("dashboard"), Icon: IconHome, show: true },
     { id: "office", label: t("navQueue"), Icon: IconInbox, show: true },
+    { id: "customers", label: t("navCustomers"), Icon: IconBriefcase, show: true },
     { id: "catalog", label: t("navCatalog"), Icon: IconGrid, show: isAdmin },
     { id: "team", label: t("navTeam"), Icon: IconUsers, show: isAdmin },
     { id: "guide", label: t("userGuide"), Icon: IconBook, show: true },

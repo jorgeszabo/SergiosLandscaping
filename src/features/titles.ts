@@ -7,6 +7,7 @@ export function screenTitle(name: ViewName, t: (k: string) => string, isOffice: 
     case "office": return t("queue");
     case "catalog": return t("catTitle");
     case "team": return t("manageTeam");
+    case "customers": return t("navCustomers");
     case "review": return t("review");
     case "print": return t("proposal");
     case "newJob": return t("newInsp");
