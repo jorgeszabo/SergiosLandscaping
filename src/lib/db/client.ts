@@ -16,12 +16,26 @@ const URL_VARS = [
   "POSTGRES_URL_NON_POOLING",
 ];
 
+const isPgUrl = (v: unknown): v is string =>
+  typeof v === "string" && /^postgres(ql)?:\/\//.test(v);
+
 export function databaseUrl(): string | undefined {
+  // 1. Standard names (empty / default prefix).
   for (const v of URL_VARS) {
-    const val = process.env[v];
-    if (val && val.length > 0) return val;
+    if (isPgUrl(process.env[v])) return process.env[v];
   }
-  return undefined;
+  // 2. Any env var holding a Postgres connection string. Handles a custom
+  //    integration prefix (e.g. STORAGE_URL, STORAGE_DATABASE_URL). Prefer a
+  //    pooled connection for serverless (skip *UNPOOLED / *NON_POOLING).
+  const found: { key: string; val: string }[] = [];
+  for (const [key, val] of Object.entries(process.env)) {
+    if (isPgUrl(val)) found.push({ key, val });
+  }
+  if (found.length === 0) return undefined;
+  const pooled = found.find(
+    (f) => !/UNPOOLED|NON_POOLING/i.test(f.key) && /(_|^)(DATABASE|POSTGRES)_URL$|(_|^)URL$/i.test(f.key)
+  );
+  return (pooled || found[0]).val;
 }
 
 export function isDbConfigured(): boolean {
