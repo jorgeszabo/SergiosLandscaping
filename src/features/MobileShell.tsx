@@ -44,7 +44,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
       <header className="mtopbar noprint">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="mlogo" src="/logo.png" alt="Sergio's Landscaping" />
-        <div className="mtitle">{screenTitle(view.name, t, isOffice)}</div>
+        <div className="mtitle">{screenTitle(view.name, t)}</div>
         <HelpButton view={view.name} />
         <button className="iconbtn" aria-label="Language" onClick={() => setLang(lang === "es" ? "en" : "es")}>
           <span style={{ fontSize: 13, fontWeight: 700 }}>{lang === "es" ? "ES" : "EN"}</span>

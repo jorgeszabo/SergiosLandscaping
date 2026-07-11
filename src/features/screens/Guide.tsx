@@ -14,7 +14,7 @@ const GUIDE = {
     },
     {
       h: "For the office / admin",
-      p: "1. Submitted inspections appear in the Queue.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin.\n3. Approve → creates a work order.\n4. Start work, then Mark complete and capture the customer's completion signature.\n5. Print the branded proposal at any point. Billing after completion is handled by the office, outside the app.",
+      p: "1. Submitted inspections appear under Jobs.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin.\n3. Approve → creates a work order.\n4. Start work, then Mark complete and capture the customer's completion signature.\n5. Print the branded proposal at any point. Billing after completion is handled by the office, outside the app.",
     },
     {
       h: "Customers & job history",
@@ -30,7 +30,7 @@ const GUIDE = {
     },
     {
       h: "Fixing mistakes",
-      p: "Backing out of a brand-new inspection before entering anything leaves nothing behind. Admins can permanently delete an inspection/quote from the Review screen or the Queue, and remove a customer from the Customers screen. Every destructive action asks you to confirm first.",
+      p: "Backing out of a brand-new inspection before entering anything leaves nothing behind. Admins can permanently delete an inspection/quote from the Review screen or the Jobs list, and remove a customer from the Customers screen. Every destructive action asks you to confirm first.",
     },
     {
       h: "Catalog",
@@ -56,7 +56,7 @@ const GUIDE = {
     },
     {
       h: "Para la oficina / admin",
-      p: "1. Las inspecciones enviadas aparecen en la Cola.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen.\n3. Aprobar → crea una orden de trabajo.\n4. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n5. Imprime la propuesta con marca en cualquier momento. La facturación posterior la maneja la oficina, fuera de la app.",
+      p: "1. Las inspecciones enviadas aparecen en Trabajos.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen.\n3. Aprobar → crea una orden de trabajo.\n4. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n5. Imprime la propuesta con marca en cualquier momento. La facturación posterior la maneja la oficina, fuera de la app.",
     },
     {
       h: "Clientes e historial",
@@ -72,7 +72,7 @@ const GUIDE = {
     },
     {
       h: "Corregir errores",
-      p: "Si sales de una inspección nueva antes de capturar algo, no queda nada guardado. Los admins pueden eliminar de forma permanente una inspección/cotización desde Revisar o la Cola, y quitar un cliente desde la pantalla de Clientes. Toda acción destructiva pide confirmación primero.",
+      p: "Si sales de una inspección nueva antes de capturar algo, no queda nada guardado. Los admins pueden eliminar de forma permanente una inspección/cotización desde Revisar o la lista de Trabajos, y quitar un cliente desde la pantalla de Clientes. Toda acción destructiva pide confirmación primero.",
     },
     {
       h: "Catálogo",

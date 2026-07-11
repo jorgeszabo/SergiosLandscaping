@@ -92,7 +92,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
 
       <div className="deskmain">
         <header className="topbar noprint">
-          <h1>{screenTitle(view.name, t, true)}</h1>
+          <h1>{screenTitle(view.name, t)}</h1>
           <div className="row" style={{ gap: 6 }}>
             <ThemePicker compact />
             <HelpButton view={view.name} />

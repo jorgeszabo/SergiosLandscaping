@@ -136,15 +136,15 @@ const HELP: Partial<Record<ViewName, { en: Entry; es: Entry }>> = {
     ]},
   },
   office: {
-    en: { title: "Queue", steps: [
-      "Submitted inspections land here for review.",
-      "Filter by needs review, work orders, or completed.",
-      "Open one to price, approve, and track it to completion.",
+    en: { title: "Jobs", steps: [
+      "Every job at every stage lives here — submitted inspections, work orders, and completed work.",
+      "Filter by needs review, work orders, completed, or all.",
+      "Open one to price, approve, and track it to completion. Admins can delete a job from its row.",
     ]},
-    es: { title: "Cola", steps: [
-      "Las inspecciones enviadas llegan aquí para revisión.",
-      "Filtra por por revisar, órdenes de trabajo o completadas.",
-      "Abre una para cotizar, aprobar y seguirla hasta completarla.",
+    es: { title: "Trabajos", steps: [
+      "Aquí están todos los trabajos en cada etapa — inspecciones enviadas, órdenes de trabajo y trabajos completados.",
+      "Filtra por por revisar, órdenes de trabajo, completadas o todas.",
+      "Abre uno para cotizar, aprobar y seguirlo hasta completarlo. Los admins pueden eliminar un trabajo desde su fila.",
     ]},
   },
   team: {

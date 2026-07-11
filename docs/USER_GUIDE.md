@@ -51,7 +51,7 @@ never sees dollar amounts).
 
 ## Office / admin — pricing and work orders
 
-1. Submitted inspections appear in the **Queue** (with counts on the dashboard).
+1. Submitted inspections appear under **Jobs** (with counts on the dashboard).
 2. Open one to land in the **quote editor**:
    - adjust line items; add part / labor / assembly / local-purchase lines,
    - stage each line as **on quote / deferred / declined**,
@@ -89,7 +89,7 @@ to open their record:
 - Backing out of a brand-new inspection **before entering anything** leaves no
   empty entry behind. Anything entered past the first screen is kept as a draft.
 - **Admins can permanently delete** an inspection/quote — from the **Review**
-  screen or the trash icon on a **Queue** row — to clear tests and mistakes.
+  screen or the trash icon on a **Jobs** row — to clear tests and mistakes.
 - Every **destructive action asks you to confirm** first.
 
 ---
