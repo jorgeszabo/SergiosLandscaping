@@ -7,8 +7,10 @@ import { useNav } from "../nav";
 import { useInspection } from "../useInspection";
 import { uid } from "@/lib/data/id";
 import { mapsConfigured, loadMaps } from "@/lib/maps";
-import { IconChevronLeft, IconPin } from "@/components/icons";
+import { IconChevronLeft, IconPin, IconSearch } from "@/components/icons";
 import type { Customer, LatLng } from "@/lib/data/types";
+
+type Suggestion = { id: string; primary: string; secondary: string; pred: any };
 
 export function NewJob() {
   const { insp, save } = useInspection();
@@ -20,65 +22,90 @@ export function NewJob() {
   const [address, setAddress] = useState(insp?.address || "");
   const [city, setCity] = useState(insp?.city || "");
   const [geo, setGeo] = useState<LatLng | undefined>(insp?.geo);
-  const acHostRef = useRef<HTMLDivElement>(null);
 
-  // Google Places address autocomplete. Uses the modern PlaceAutocompleteElement
-  // (the legacy `places.Autocomplete` widget is disabled for Google Cloud
-  // projects created after March 2025). Renders Google's own input into the
-  // host div; on selection we parse the components into address/city/geo.
+  const [sugs, setSugs] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const places = useRef<any>(null);
+  const token = useRef<any>(null);
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load the Places (New) library once; keep a session token for billing.
   useEffect(() => {
-    if (!mapsConfigured() || !acHostRef.current) return;
-    let el: any = null;
+    if (!mapsConfigured()) return;
     let cancelled = false;
-    const host = acHostRef.current;
-
     loadMaps()
       .then(async (maps) => {
-        if (cancelled || !host) return;
-        // The new element ships in the "places" library.
-        const places = maps.importLibrary ? await maps.importLibrary("places") : maps.places;
-        const PlaceAutocompleteElement = places.PlaceAutocompleteElement || maps.places.PlaceAutocompleteElement;
-        if (!PlaceAutocompleteElement) return;
-
-        el = new PlaceAutocompleteElement();
-        el.style.width = "100%";
-        host.appendChild(el);
-
-        const onSelect = async (ev: any) => {
-          try {
-            const pred = ev?.placePrediction;
-            const place = pred?.toPlace ? pred.toPlace() : ev?.place;
-            if (!place) return;
-            await place.fetchFields({ fields: ["formattedAddress", "addressComponents", "location"] });
-            const comps: any[] = place.addressComponents || [];
-            const pick = (type: string) => comps.find((c) => (c.types || []).includes(type));
-            const streetNo = pick("street_number")?.longText || "";
-            const route = pick("route")?.longText || "";
-            const cityName =
-              pick("locality")?.longText || pick("sublocality")?.longText || pick("postal_town")?.longText || "";
-            const state = pick("administrative_area_level_1")?.shortText || "";
-            const zip = pick("postal_code")?.longText || "";
-            const streetLine = [streetNo, route].filter(Boolean).join(" ");
-            setAddress(streetLine || place.formattedAddress || "");
-            setCity([cityName, state, zip].filter(Boolean).join(", "));
-            const loc = place.location;
-            if (loc) setGeo({ lat: loc.lat(), lng: loc.lng() });
-          } catch {
-            /* ignore selection parse errors */
-          }
-        };
-
-        // Current API fires "gmp-select"; older betas used "gmp-placeselect".
-        el.addEventListener("gmp-select", onSelect);
-        el.addEventListener("gmp-placeselect", onSelect);
+        if (cancelled) return;
+        const lib = maps.importLibrary ? await maps.importLibrary("places") : maps.places;
+        places.current = lib;
+        if (lib?.AutocompleteSessionToken) token.current = new lib.AutocompleteSessionToken();
       })
       .catch(() => {});
-
     return () => {
       cancelled = true;
-      if (el && el.parentNode) el.parentNode.removeChild(el);
+      if (debounce.current) clearTimeout(debounce.current);
     };
   }, []);
+
+  const fetchSugs = (input: string) => {
+    const lib = places.current;
+    if (!lib?.AutocompleteSuggestion || input.trim().length < 3) {
+      setSugs([]);
+      return;
+    }
+    const req: any = { input, sessionToken: token.current };
+    lib.AutocompleteSuggestion.fetchAutocompleteSuggestions(req)
+      .then((res: any) => {
+        const list: Suggestion[] = (res?.suggestions || [])
+          .map((s: any) => s.placePrediction)
+          .filter(Boolean)
+          .map((p: any) => ({
+            id: p.placeId || uid(),
+            primary: p.mainText?.text || p.text?.text || "",
+            secondary: p.secondaryText?.text || "",
+            pred: p,
+          }));
+        setSugs(list);
+        setOpen(list.length > 0);
+      })
+      .catch(() => setSugs([]));
+  };
+
+  const onAddressInput = (v: string) => {
+    setAddress(v);
+    setGeo(undefined);
+    if (debounce.current) clearTimeout(debounce.current);
+    debounce.current = setTimeout(() => fetchSugs(v), 250);
+  };
+
+  const choose = async (s: Suggestion) => {
+    setOpen(false);
+    try {
+      const place = s.pred.toPlace();
+      await place.fetchFields({ fields: ["formattedAddress", "addressComponents", "location"] });
+      const comps: any[] = place.addressComponents || [];
+      const pick = (type: string) => comps.find((c) => (c.types || []).includes(type));
+      const streetNo = pick("street_number")?.longText || "";
+      const route = pick("route")?.longText || "";
+      const cityName =
+        pick("locality")?.longText || pick("sublocality")?.longText || pick("postal_town")?.longText || "";
+      const state = pick("administrative_area_level_1")?.shortText || "";
+      const zip = pick("postal_code")?.longText || "";
+      const streetLine = [streetNo, route].filter(Boolean).join(" ");
+      setAddress(streetLine || place.formattedAddress || s.primary);
+      setCity([cityName, state, zip].filter(Boolean).join(", "));
+      const loc = place.location;
+      if (loc) setGeo({ lat: loc.lat(), lng: loc.lng() });
+    } catch {
+      // Fall back to the suggestion text if detail fetch fails.
+      setAddress(s.primary);
+      setCity(s.secondary);
+    }
+    setSugs([]);
+    // Fresh session token for the next lookup (Places billing best practice).
+    const lib = places.current;
+    if (lib?.AutocompleteSessionToken) token.current = new lib.AutocompleteSessionToken();
+  };
 
   if (!insp) return null;
 
@@ -86,6 +113,8 @@ export function NewJob() {
     setCustomer(c.name);
     setAddress(c.address);
     setCity(c.city);
+    setSugs([]);
+    setOpen(false);
   };
 
   const next = () => {
@@ -124,26 +153,46 @@ export function NewJob() {
           <label className="f">{t("customer")}</label>
           <input className="t" value={customer} placeholder={t("searchCust")} onChange={(e) => setCustomer(e.target.value)} />
         </div>
-        <div>
+        <div style={{ position: "relative" }}>
           <label className="f">{t("address")}</label>
-          {mapsConfigured() ? (
-            <>
-              {/* Google renders its own search input into this host. */}
-              <div ref={acHostRef} className="ac-host" />
-              <input
-                className="t"
-                style={{ marginTop: 8 }}
-                value={address}
-                placeholder={t("address")}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </>
-          ) : (
+          <div style={{ position: "relative" }}>
+            {mapsConfigured() && (
+              <span
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "var(--text-muted)",
+                  pointerEvents: "none",
+                  display: "flex",
+                }}
+              >
+                <IconSearch size={16} />
+              </span>
+            )}
             <input
               className="t"
+              style={mapsConfigured() ? { paddingLeft: 36 } : undefined}
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              placeholder={mapsConfigured() ? t("searchAddress") : ""}
+              autoComplete="off"
+              onChange={(e) => onAddressInput(e.target.value)}
+              onFocus={() => sugs.length && setOpen(true)}
+              onBlur={() => setTimeout(() => setOpen(false), 150)}
             />
+          </div>
+          {open && sugs.length > 0 && (
+            <ul className="ac-drop">
+              {sugs.map((s) => (
+                <li key={s.id}>
+                  <button type="button" className="ac-item" onMouseDown={(e) => e.preventDefault()} onClick={() => choose(s)}>
+                    <span className="ac-primary">{s.primary}</span>
+                    {s.secondary && <span className="ac-secondary">{s.secondary}</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
         <div>
