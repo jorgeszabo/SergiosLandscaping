@@ -23,6 +23,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
 
   const titleFor = (v: ViewName): string => {
     switch (v) {
+      case "home": return t("queue");
       case "office": return t("queue");
       case "catalog": return t("catTitle");
       case "team": return t("manageTeam");
@@ -47,7 +48,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
   };
 
   const active = (id: ViewName) =>
-    id === view.name || (id === "office" && ["review", "print"].includes(view.name));
+    id === view.name || (id === "office" && ["home", "review", "print"].includes(view.name));
 
   return (
     <div className="deskshell">

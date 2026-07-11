@@ -42,7 +42,7 @@ export function Login() {
           <img
             src="/logo.png"
             alt="Sergio's Landscaping"
-            style={{ height: 92, width: "auto", display: "inline-block" }}
+            style={{ width: 240, maxWidth: "80%", height: "auto", display: "inline-block" }}
           />
           <div
             className="eyebrow"
