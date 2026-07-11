@@ -15,7 +15,8 @@ export type ViewName =
   | "catalog"
   | "office"
   | "team"
-  | "guide";
+  | "guide"
+  | "map";
 
 export interface View {
   name: ViewName;

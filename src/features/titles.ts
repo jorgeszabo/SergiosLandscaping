@@ -14,6 +14,7 @@ export function screenTitle(name: ViewName, t: (k: string) => string, isOffice: 
     case "zones": return t("zonesHub");
     case "zone": return t("zone");
     case "addIssue": return t("addIssue");
+    case "map": return t("siteMap");
     default: return t("appName");
   }
 }

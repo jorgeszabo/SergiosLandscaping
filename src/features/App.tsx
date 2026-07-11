@@ -20,6 +20,7 @@ import { Catalog } from "./screens/Catalog";
 import { Office } from "./screens/Office";
 import { Team } from "./screens/Team";
 import { Guide } from "./screens/Guide";
+import { SiteMap } from "./screens/SiteMap";
 
 export default function App() {
   return (
@@ -119,6 +120,8 @@ function Screen() {
       return <Team />;
     case "guide":
       return <Guide />;
+    case "map":
+      return <SiteMap />;
     default:
       return <Home />;
   }
