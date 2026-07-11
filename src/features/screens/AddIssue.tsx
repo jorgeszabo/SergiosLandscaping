@@ -6,6 +6,8 @@ import { useNav } from "../nav";
 import { useInspection } from "../useInspection";
 import { priceLine, money, findIssue } from "@/lib/money/engine";
 import { uid } from "@/lib/data/id";
+import { compressImage } from "@/lib/image";
+import { IconCamera } from "@/components/icons";
 import type { Line, Severity } from "@/lib/data/types";
 
 export function AddIssue() {
@@ -20,7 +22,7 @@ export function AddIssue() {
   const [count, setCount] = useState(1);
   const [severity, setSeverity] = useState<Severity>("functional");
   const [action, setAction] = useState<"repair" | "replace">("repair");
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
 
   const def = findIssue(catalog, issueId);
   const canSeePrice = !!user?.permissions.seePrices;
@@ -43,13 +45,15 @@ export function AddIssue() {
     }
   };
 
-  const onPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const rd = new FileReader();
-    rd.onload = () => setPhoto(rd.result as string);
-    rd.readAsDataURL(f);
+  const onPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    for (const f of files) {
+      const compressed = await compressImage(f);
+      setPhotos((p) => [...p, compressed]);
+    }
   };
+  const removePhoto = (i: number) => setPhotos((p) => p.filter((_, x) => x !== i));
 
   const saveIssue = () => {
     if (!insp || !issueId) return;
@@ -62,7 +66,7 @@ export function AddIssue() {
       attrVal,
       severity,
       action,
-      photo,
+      photos,
       zone: isSystem ? "system" : (view.zn as number),
     };
     save({ ...insp, lines: [...insp.lines, line] });
@@ -146,14 +150,26 @@ export function AddIssue() {
 
         <div>
           <label className="f">{t("photo")}</label>
-          <label className="btn sm ghost" style={{ display: "inline-flex" }}>
-            <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={onPhoto} />
-            📷 {t("addPhoto")}
-          </label>
-          {photo && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="thumb" src={photo} alt="" style={{ marginLeft: 8, verticalAlign: "middle" }} />
-          )}
+          <div className="row" style={{ gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {photos.map((src, i) => (
+              <span key={i} style={{ position: "relative", display: "inline-block" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="thumb" src={src} alt="" style={{ width: 56, height: 56 }} />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  aria-label="Remove photo"
+                  style={{ position: "absolute", top: -6, right: -6, background: "var(--danger)", color: "#fff", border: "none", borderRadius: "50%", width: 20, height: 20, fontSize: 13, lineHeight: 1 }}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+            <label className="btn sm ghost" style={{ display: "inline-flex" }}>
+              <input type="file" accept="image/*" capture="environment" multiple style={{ display: "none" }} onChange={onPhoto} />
+              <IconCamera size={16} /> {t("addPhoto")}
+            </label>
+          </div>
         </div>
       </div>
 

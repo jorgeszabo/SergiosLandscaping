@@ -6,6 +6,10 @@
 
 export type Lang = "en" | "es";
 
+/** Light (default), Dark, or Sunny — a very high-contrast light theme for
+    reading the screen outdoors in bright sun. */
+export type Theme = "light" | "dark" | "sunny";
+
 /** A user-visible name carrying an English and a Spanish value. */
 export interface LocalizedName {
   en: string;
@@ -169,7 +173,10 @@ export interface Line {
   attrVal?: string;
   severity?: Severity;
   action?: FixAction;
+  /** Legacy single photo (kept for back-compat). */
   photo?: string | null;
+  /** Multiple photos per finding (data URLs). */
+  photos?: string[];
   note?: string;
   zone?: number | "system";
   // part / labor / assembly lines
@@ -223,6 +230,6 @@ export interface Database {
   catalog: Catalog;
   customers: Customer[];
   inspections: Inspection[];
-  settings: { lang: Lang; showRunningTotal?: boolean };
+  settings: { lang: Lang; showRunningTotal?: boolean; theme?: Theme };
   session: string | null;
 }

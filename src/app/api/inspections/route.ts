@@ -26,6 +26,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "bad request" }, { status: 400 });
   }
   if (!insp?.id) return NextResponse.json({ error: "missing id" }, { status: 400 });
-  await upsertInspection(insp);
+  const applied = await upsertInspection(insp);
+  if (!applied) {
+    // A newer version exists on the server — signal a conflict so the client
+    // pulls the current copy instead of clobbering it.
+    return NextResponse.json({ error: "conflict", conflict: true }, { status: 409 });
+  }
   return NextResponse.json({ ok: true });
 }

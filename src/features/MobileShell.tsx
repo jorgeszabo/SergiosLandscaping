@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useNav } from "./nav";
 import { screenTitle } from "./titles";
 import { HelpButton } from "./help";
+import { ThemePicker } from "./ThemePicker";
 import { Sheet } from "@/components/Sheet";
 import { uid } from "@/lib/data/id";
 import type { Inspection } from "@/lib/data/types";
@@ -95,6 +96,12 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
             <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconGlobe size={18} /></span>
             {lang === "es" ? "English" : "Español"}
           </button>
+          <div style={{ padding: "8px 14px 6px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 8 }}>
+              {t("theme")}
+            </div>
+            <ThemePicker />
+          </div>
           <button className="dz" onClick={() => { setMore(false); void logout(); }}>
             <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconLogout size={18} /></span>
             {t("logout")}

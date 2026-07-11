@@ -129,16 +129,21 @@ export async function getInspection(id: string): Promise<Inspection | null> {
   return rows.length ? { ...(rows[0].data as Inspection), synced: true } : null;
 }
 
-export async function upsertInspection(insp: Inspection): Promise<void> {
+/** Upsert an inspection, but never let an OLDER write overwrite a newer one
+    (optimistic concurrency). Returns false when the incoming copy is stale —
+    the caller should treat that as a conflict and pull the server's version. */
+export async function upsertInspection(insp: Inspection): Promise<boolean> {
   await ensureInitialized();
   const sql = getSql();
   const clean: Inspection = { ...insp, synced: true };
   const updatedAt = insp.updatedAt || Date.now();
-  await sql`
+  const result = await sql`
     INSERT INTO inspections (id, status, tech, updated_at, data)
     VALUES (${insp.id}, ${insp.status}, ${insp.tech}, ${updatedAt},
             ${sql.json(clean as unknown as Parameters<typeof sql.json>[0])})
     ON CONFLICT (id) DO UPDATE SET
       status = EXCLUDED.status, tech = EXCLUDED.tech,
-      updated_at = EXCLUDED.updated_at, data = EXCLUDED.data`;
+      updated_at = EXCLUDED.updated_at, data = EXCLUDED.data
+    WHERE inspections.updated_at <= EXCLUDED.updated_at`;
+  return result.count > 0;
 }
