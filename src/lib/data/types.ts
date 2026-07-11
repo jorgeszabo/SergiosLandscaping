@@ -245,8 +245,12 @@ export interface Inspection {
   lines: Line[];
   /** Customer signature approving the estimate (captured in the field). */
   signature?: string | null;
+  /** Date the estimate was signed / submitted (ISO yyyy-mm-dd). */
+  signedDate?: string;
   /** Customer signature confirming the completed work (captured on close-out). */
   completionSignature?: string | null;
+  /** Date the job was marked completed (ISO yyyy-mm-dd). */
+  completedDate?: string;
   /** Local-first sync bookkeeping. */
   updatedAt?: number;
   synced?: boolean;

@@ -56,21 +56,28 @@ export function demoInspections(now: number): Inspection[] {
     zones: Zone[],
     lines: Line[],
     extra: Partial<Inspection> = {}
-  ): Inspection => ({
-    id: `${DEMO_PREFIX}i${n}`,
-    customer: cust,
-    address,
-    city,
-    tech,
-    date: new Date(now - n * day).toISOString().slice(0, 10),
-    status,
-    snapshot: { brand: "Hunter", model: "X-Core", stations: String(zones.length), backflow: "PVB", pressure: "62", rainSensor: "yes" },
-    zones,
-    lines,
-    updatedAt: now - n * 3_600_000,
-    synced: true,
-    ...extra,
-  });
+  ): Inspection => {
+    const date = new Date(now - n * day).toISOString().slice(0, 10);
+    const signed = ["submitted", "under_review", "approved", "in_progress", "completed"].includes(status);
+    return {
+      id: `${DEMO_PREFIX}i${n}`,
+      customer: cust,
+      address,
+      city,
+      tech,
+      date,
+      status,
+      snapshot: { brand: "Hunter", model: "X-Core", stations: String(zones.length), backflow: "PVB", pressure: "62", rainSensor: "yes" },
+      zones,
+      lines,
+      // Signed/completed dates so the sample documents show them.
+      signedDate: signed ? date : undefined,
+      completedDate: status === "completed" ? new Date(now - Math.max(0, n - 2) * day).toISOString().slice(0, 10) : undefined,
+      updatedAt: now - n * 3_600_000,
+      synced: true,
+      ...extra,
+    };
+  };
 
   return [
     mk(1, "Henderson Residence", "412 Lakeway Dr", "Montgomery, TX", "Antonio", "draft",

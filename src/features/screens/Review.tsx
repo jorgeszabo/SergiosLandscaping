@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
@@ -25,7 +25,17 @@ export function Review() {
   const { navigate, back } = useNav();
   const [sheet, setSheet] = useState<SheetState>(null);
 
+  // When the office/admin opens a just-submitted inspection, move it to
+  // "under review" so the status reflects that someone has picked it up.
+  useEffect(() => {
+    if (insp && (user?.role === "office" || user?.role === "admin") && insp.status === "submitted") {
+      save({ ...insp, status: "under_review" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [insp?.id]);
+
   if (!insp || !user) return null;
+  const today = () => new Date().toISOString().slice(0, 10);
 
   const canSeePrice = user.permissions.seePrices;
   const canEdit = user.permissions.setPrice;
@@ -221,6 +231,28 @@ export function Review() {
               </div>
             )}
 
+            {/* Read-only: show captured signatures + dates once signed. */}
+            {((insp.signature && !fieldEditable) || (insp.completionSignature && !(isOffice && isWorkOrder))) && (
+              <div className="card">
+                {insp.signature && !fieldEditable && (
+                  <div>
+                    <div className="f" style={{ marginTop: 0 }}>{t("custSignEstimate")}</div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={insp.signature} alt="signature" style={{ height: 54, display: "block", marginTop: 4 }} />
+                    <div className="sub" style={{ margin: "4px 0 0" }}>{t("signedOn")} · {insp.signedDate || insp.date}</div>
+                  </div>
+                )}
+                {insp.completionSignature && !(isOffice && isWorkOrder) && (
+                  <div style={{ marginTop: insp.signature && !fieldEditable ? 14 : 0 }}>
+                    <div className="f" style={{ marginTop: 0 }}>{t("custSignComplete")}</div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={insp.completionSignature} alt="completion signature" style={{ height: 54, display: "block", marginTop: 4 }} />
+                    <div className="sub" style={{ margin: "4px 0 0" }}>{t("completedOn")} · {insp.completedDate || insp.date}</div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Office/admin: customer signs to confirm completed work */}
             {isOffice && isWorkOrder && (
               <div className="card noprint">
@@ -238,7 +270,7 @@ export function Review() {
               <button
                 className="btn pri block noprint"
                 onClick={() => {
-                  setStatus("submitted");
+                  save({ ...insp, status: "submitted", signedDate: insp.signedDate || today() });
                   toast(t("submitted"));
                   navigate({ name: "home" });
                 }}
@@ -274,7 +306,7 @@ export function Review() {
                 className="btn green block noprint"
                 style={{ marginTop: 8 }}
                 onClick={() => {
-                  setStatus("completed");
+                  save({ ...insp, status: "completed", completedDate: today() });
                   toast(t("jobCompleted"));
                 }}
               >
