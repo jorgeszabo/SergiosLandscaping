@@ -114,13 +114,15 @@ const HELP: Partial<Record<ViewName, { en: Entry; es: Entry }>> = {
     ]},
   },
   print: {
-    en: { title: "Proposal", steps: [
-      "This is the branded proposal for the customer.",
-      "Tap Print / save to print or save as PDF.",
+    en: { title: "Documents", steps: [
+      "One branded document per stage: inspection report, estimate, work order, or completion.",
+      "Tap Print / save PDF. Choose “Save as PDF” in the dialog to email or file it.",
+      "Open the others from the Review screen — availability depends on the job's stage.",
     ]},
-    es: { title: "Propuesta", steps: [
-      "Esta es la propuesta con marca para el cliente.",
-      "Toca Imprimir / guardar para imprimir o guardar como PDF.",
+    es: { title: "Documentos", steps: [
+      "Un documento con marca por etapa: reporte, estimado, orden de trabajo o finalización.",
+      "Toca Imprimir / guardar PDF. Elige “Guardar como PDF” para enviarlo o archivarlo.",
+      "Abre los demás desde Revisar — la disponibilidad depende de la etapa del trabajo.",
     ]},
   },
   catalog: {
