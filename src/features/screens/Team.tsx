@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
+import { IconTrash } from "@/components/icons";
 import type { Lang, Permissions, Role, User } from "@/lib/data/types";
 
 const ROLES: Role[] = ["field", "lead", "office", "admin"];
@@ -43,6 +44,7 @@ export function Team() {
   const [busy, setBusy] = useState(false);
 
   if (!user) return null;
+  const isAdmin = !!user.permissions.editCatalog;
 
   const startNew = () => {
     setEditing("new");
@@ -208,16 +210,31 @@ export function Team() {
           {db.users.map((u) => {
             const keys = PERM_KEYS.filter((k) => u.permissions[k]).map((k) => t(PERM_LABEL[k]).split(" ")[0]);
             return (
-              <button key={u.id} className="item" onClick={() => startEdit(u)}>
-                <div className="g">
-                  <div className="n">
-                    {u.name}{" "}
-                    <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>@{u.id}</span>
+              <div key={u.id} className="item" style={{ gap: 10 }}>
+                <button
+                  onClick={() => startEdit(u)}
+                  style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, background: "none", border: "none", textAlign: "left", padding: 0, cursor: "pointer", minWidth: 0 }}
+                >
+                  <div className="g">
+                    <div className="n">
+                      {u.name}{" "}
+                      <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>@{u.id}</span>
+                    </div>
+                    <div className="m">{keys.join(" · ") || "—"}</div>
                   </div>
-                  <div className="m">{keys.join(" · ") || "—"}</div>
-                </div>
-                <span className={`badge ${u.role === "admin" ? "navy" : "gray"}`}>{t("role_" + u.role)}</span>
-              </button>
+                  <span className={`badge ${u.role === "admin" ? "navy" : "gray"}`}>{t("role_" + u.role)}</span>
+                </button>
+                {isAdmin && u.id !== user.id && (
+                  <button
+                    className="iconbtn"
+                    title={t("deleteUser")}
+                    aria-label={t("deleteUser")}
+                    onClick={() => remove(u)}
+                  >
+                    <IconTrash size={17} />
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
