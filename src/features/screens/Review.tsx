@@ -6,6 +6,7 @@ import { useToast } from "@/components/Toast";
 import { useNav } from "../nav";
 import { useInspection } from "../useInspection";
 import { Sheet } from "@/components/Sheet";
+import { Lightbox } from "@/components/Lightbox";
 import { Signature } from "@/components/Signature";
 import { priceLine, lineName, inspectionTotals, money } from "@/lib/money/engine";
 import { exportWorkOrder } from "@/lib/integration/work-order";
@@ -24,6 +25,7 @@ export function Review() {
   const toast = useToast();
   const { navigate, back } = useNav();
   const [sheet, setSheet] = useState<SheetState>(null);
+  const [lightbox, setLightbox] = useState<number | null>(null);
 
   // When the office/admin opens a just-submitted inspection, move it to
   // "under review" so the status reflects that someone has picked it up.
@@ -43,6 +45,14 @@ export function Review() {
   const isOffice = user.role === "office" || user.role === "admin";
   const isAdmin = !!user.permissions.editCatalog;
   const tot = inspectionTotals(insp, catalog);
+
+  // Every job photo, tagged with what it's of (zone + issue) for the caption.
+  const photoShots = insp.lines.flatMap((l) => {
+    const ps = [...(l.photos || []), ...(l.photo ? [l.photo] : [])];
+    const zoneLabel = l.zone === "system" ? t("systemWide") : l.zone != null ? `${t("zone")} ${l.zone}` : "";
+    const caption = [zoneLabel, lineName(l, catalog, lang)].filter(Boolean).join(" · ");
+    return ps.map((src) => ({ src, caption }));
+  });
 
   const deleteThis = async () => {
     if (!window.confirm(t("confirmDeleteInspection"))) return;
@@ -164,26 +174,26 @@ export function Review() {
       {group("deferred", t("deferredH"))}
       {group("declined", t("declinedH"))}
 
-      {(() => {
-        const shots = insp.lines.flatMap((l) => {
-          const ps = [...(l.photos || []), ...(l.photo ? [l.photo] : [])];
-          return ps.map((src) => ({ src, name: lineName(l, catalog, lang) }));
-        });
-        if (!shots.length) return null;
-        return (
-          <>
-            <h2>{t("photo")}</h2>
-            <div className="card">
-              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-                {shots.map((s, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} className="thumb" src={s.src} alt={s.name} title={s.name} style={{ width: 74, height: 74 }} />
-                ))}
-              </div>
+      {photoShots.length > 0 && (
+        <>
+          <h2>{t("photos")}</h2>
+          <div className="card">
+            <div className="photo-grid">
+              {photoShots.map((s, i) => (
+                <button key={i} type="button" className="photo-cell" onClick={() => setLightbox(i)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={s.src} alt={s.caption} />
+                  {s.caption && <span className="photo-cap">{s.caption}</span>}
+                </button>
+              ))}
             </div>
-          </>
-        );
-      })()}
+          </div>
+        </>
+      )}
+
+      {lightbox !== null && (
+        <Lightbox shots={photoShots} index={lightbox} onClose={() => setLightbox(null)} />
+      )}
 
       {canSeePrice && (
         <div className="card" style={{ marginTop: 14 }}>
