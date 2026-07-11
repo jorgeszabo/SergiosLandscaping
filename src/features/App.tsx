@@ -19,6 +19,7 @@ import { Print } from "./screens/Print";
 import { Catalog } from "./screens/Catalog";
 import { Office } from "./screens/Office";
 import { Team } from "./screens/Team";
+import { Customers } from "./screens/Customers";
 import { Guide } from "./screens/Guide";
 import { SiteMap } from "./screens/SiteMap";
 
@@ -119,6 +120,8 @@ function Screen() {
       return <Office />;
     case "team":
       return <Team />;
+    case "customers":
+      return <Customers />;
     case "guide":
       return <Guide />;
     case "map":

@@ -231,6 +231,9 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     demoHint: "Sample customers and inspections at each stage. Safe to load and clear anytime.",
     // customer management
     customersHdr: "Customers",
+    navCustomers: "Customers",
+    custScreenHint: "Tap a customer to start an inspection there.",
+    startInspection: "Start inspection",
     customersHint: "Every saved customer. Remove ones added by mistake — inspections keep their own copy of the name.",
     searchCustomers: "Search customers…",
     noCustomers: "No customers yet.",
@@ -508,6 +511,9 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     demoHint: "Clientes e inspecciones de ejemplo en cada etapa. Puedes cargarlos y borrarlos cuando quieras.",
     // customer management
     customersHdr: "Clientes",
+    navCustomers: "Clientes",
+    custScreenHint: "Toca un cliente para iniciar una inspección ahí.",
+    startInspection: "Iniciar inspección",
     customersHint: "Todos los clientes guardados. Elimina los que se agregaron por error — las inspecciones conservan su propia copia del nombre.",
     searchCustomers: "Buscar clientes…",
     noCustomers: "Aún no hay clientes.",

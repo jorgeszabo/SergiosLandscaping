@@ -23,12 +23,38 @@ const HELP: Partial<Record<ViewName, { en: Entry; es: Entry }>> = {
   },
   newJob: {
     en: { title: "Start a job", steps: [
-      "Pick an existing customer or type a new one.",
-      "Add the address, then tap Next to record the system.",
+      "Type a name to search existing customers, or enter a new one.",
+      "Start typing the address to pick it from Google, or tap “Use my location”.",
+      "Tap Next to record the system.",
     ]},
     es: { title: "Comenzar un trabajo", steps: [
-      "Elige un cliente existente o escribe uno nuevo.",
-      "Agrega la dirección y toca Siguiente para registrar el sistema.",
+      "Escribe un nombre para buscar clientes, o ingresa uno nuevo.",
+      "Escribe la dirección para elegirla de Google, o toca “Usar mi ubicación”.",
+      "Toca Siguiente para registrar el sistema.",
+    ]},
+  },
+  customers: {
+    en: { title: "Customers", steps: [
+      "Every saved customer, searchable by name, address, or city.",
+      "Tap “Start inspection” on a customer to begin a job there.",
+      "Admins can remove an entry added by mistake with the trash icon.",
+    ]},
+    es: { title: "Clientes", steps: [
+      "Todos los clientes guardados; busca por nombre, dirección o ciudad.",
+      "Toca “Iniciar inspección” en un cliente para comenzar un trabajo ahí.",
+      "Los administradores pueden eliminar un registro con el icono de bote.",
+    ]},
+  },
+  map: {
+    en: { title: "Site map", steps: [
+      "Pick a zone, then Draw zone to outline its coverage, or add sprinkler pins.",
+      "Tap a shape or pin to select it, then Remove selected to delete it.",
+      "Save map when done — an “Unsaved changes” note warns you before leaving.",
+    ]},
+    es: { title: "Mapa del sitio", steps: [
+      "Elige una zona, luego Dibujar zona para su cobertura, o agrega aspersores.",
+      "Toca una forma o pin para seleccionarlo, luego Eliminar selección.",
+      "Guarda el mapa al terminar — un aviso te avisa si hay cambios sin guardar.",
     ]},
   },
   snapshot: {

@@ -15,6 +15,7 @@ export type ViewName =
   | "catalog"
   | "office"
   | "team"
+  | "customers"
   | "guide"
   | "map";
 
