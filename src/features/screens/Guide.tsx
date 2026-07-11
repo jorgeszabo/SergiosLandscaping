@@ -14,7 +14,11 @@ const GUIDE = {
     },
     {
       h: "For the office / admin",
-      p: "1. Submitted inspections appear under Jobs.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin.\n3. Approve → creates a work order.\n4. Start work, then Mark complete and capture the customer's completion signature.\n5. Print the branded proposal at any point. Billing after completion is handled by the office, outside the app.",
+      p: "1. Submitted inspections appear under Jobs; opening one marks it under review.\n2. Open one to adjust line items, stage them as on-quote / deferred / declined, and see margin. Captured signatures show with their dates.\n3. Reassign the job to another tech with the Assigned to selector — it moves into their dashboard queue.\n4. Approve → creates a work order.\n5. Start work, then Mark complete and capture the completion signature.\n6. Print any of the four documents. Billing after completion is handled by the office, outside the app.",
+    },
+    {
+      h: "Your dashboard",
+      p: "The 'Needs your attention' list is personal to you. Field techs/leads see only their own jobs that need action — returned to rework, drafts to finish, and their approved/in-progress work orders. Office/admin see what needs the office: submitted/under review to review, then approved to schedule. A count badge on the Dashboard nav shows how many items need you — including a job just reassigned to you. When nothing's pending it reads 'You're all caught up.'",
     },
     {
       h: "Printable documents",
@@ -60,7 +64,11 @@ const GUIDE = {
     },
     {
       h: "Para la oficina / admin",
-      p: "1. Las inspecciones enviadas aparecen en Trabajos.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen.\n3. Aprobar → crea una orden de trabajo.\n4. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n5. Imprime la propuesta con marca en cualquier momento. La facturación posterior la maneja la oficina, fuera de la app.",
+      p: "1. Las inspecciones enviadas aparecen en Trabajos; al abrir una se marca en revisión.\n2. Abre una para ajustar líneas, marcarlas como en cotización / diferido / rechazado, y ver el margen. Las firmas capturadas se muestran con su fecha.\n3. Reasigna el trabajo a otro técnico con el selector Asignado a — pasa a la cola de esa persona.\n4. Aprobar → crea una orden de trabajo.\n5. Inicia el trabajo, luego Marcar completado y captura la firma de finalización del cliente.\n6. Imprime cualquiera de los cuatro documentos. La facturación posterior la maneja la oficina, fuera de la app.",
+    },
+    {
+      h: "Tu panel",
+      p: "La lista 'Requiere tu atención' es personal. Los técnicos/líderes ven solo sus propios trabajos que necesitan acción — devueltos para rehacer, borradores por terminar, y sus órdenes aprobadas/en progreso. Oficina/admin ven lo que necesita la oficina: enviadas/en revisión por revisar, luego aprobadas por programar. Un globo con el número en la pestaña Panel muestra cuántos elementos te esperan — incluido un trabajo recién reasignado a ti. Cuando no hay pendientes dice 'Estás al día.'",
     },
     {
       h: "Documentos imprimibles",

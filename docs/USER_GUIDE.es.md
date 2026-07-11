@@ -22,10 +22,30 @@ Funciona **sin conexión** en el campo y se sincroniza al reconectar.
 
 ## Iniciar sesión
 
-Abre la app, elige tu cuenta del menú, escribe tu contraseña y toca **Iniciar
-sesión**. Puedes cambiar el idioma (English/Español) en cualquier momento desde
-la barra superior. En modo demo (antes de conectar una base de datos) cualquier
+Abre la app, elige tu cuenta y selecciona tu idioma con los botones
+**Español / English** en la tarjeta de inicio de sesión — **tu elección se
+mantiene al entrar a la app**. Escribe tu contraseña y toca **Iniciar sesión**.
+(Ya adentro, puedes cambiar el idioma en cualquier momento desde la barra
+superior.) En modo demo — antes de conectar una base de datos — cualquier
 contraseña funciona.
+
+---
+
+## Tu panel
+
+Al iniciar sesión llegas a tu **panel**. La lista **Requiere tu atención** es
+personal:
+
+- **Técnicos / líderes** ven solo *sus propios* trabajos que necesitan acción —
+  los **devueltos** para rehacer, los **borradores** por terminar, y sus
+  **órdenes aprobadas / en progreso** por realizar.
+- **Oficina / admin** ven lo que necesita la oficina — **enviadas / en revisión**
+  por revisar, luego **aprobadas** por programar.
+
+Un **globo con el número** en la pestaña **Panel** (barra lateral en escritorio,
+pestaña inferior en el teléfono) muestra cuántos elementos te esperan — incluido
+un trabajo que te acaban de **reasignar**. Cuando no hay pendientes dice *Estás
+al día.*
 
 ---
 
@@ -59,16 +79,21 @@ precios" nunca ve montos).
 ## Oficina / admin — cotizar y órdenes de trabajo
 
 1. Las inspecciones enviadas aparecen en **Trabajos** (con conteos en el panel).
+   Al abrir una se marca **en revisión**.
 2. Abre una para llegar al **editor de cotización**:
    - ajusta las líneas; agrega piezas / mano de obra / ensambles / compras
      locales,
    - marca cada línea como **en cotización / diferido / rechazado**,
-   - el lado derecho muestra piezas, mano de obra, costo, **margen** y total.
-3. **Aprobar → crea una orden de trabajo** (el único punto de control
+   - el lado derecho muestra piezas, mano de obra, costo, **margen** y total,
+   - las **firmas del cliente se muestran (solo lectura) con su fecha**.
+3. **Reasigna** el trabajo a otro técnico con el selector **Asignado a** — pasa a
+   la cola del panel de esa persona.
+4. **Aprobar → crea una orden de trabajo** (el único punto de control
    deliberado).
-4. **Iniciar trabajo**, luego **Marcar completado** y captura la **firma de
+5. **Iniciar trabajo**, luego **Marcar completado** y captura la **firma de
    finalización** del cliente.
-5. **Imprime** la propuesta con marca en cualquier etapa.
+6. **Imprime** cualquiera de los cuatro documentos (ver *Documentos
+   imprimibles* abajo).
 
 La facturación posterior a completar un trabajo la maneja la oficina, fuera de
 la app.
