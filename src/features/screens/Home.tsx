@@ -5,7 +5,7 @@ import { useNav } from "../nav";
 import { SyncStatus } from "@/components/SyncStatus";
 import { inspectionTotals, money } from "@/lib/money/engine";
 import { newInspectionDraft } from "@/lib/data/factory";
-import { badgeTone } from "@/lib/data/status";
+import { badgeTone, myAttention } from "@/lib/data/status";
 import { ListAvatar } from "@/components/ListAvatar";
 import { IconPlus, IconInbox } from "@/components/icons";
 import type { Inspection, InspectionStatus } from "@/lib/data/types";
@@ -48,20 +48,8 @@ export function Home() {
         { l: t("st_completed"), v: scount((s) => s === "completed") },
       ];
 
-  // Only the items needing THIS user's action, most urgent first. Office:
-  // things to review then schedule. Field: rework, then finish drafts, then
-  // the work orders to go do.
-  const attnStatuses: InspectionStatus[] = isOffice
-    ? ["submitted", "under_review", "approved"]
-    : ["returned", "draft", "approved", "in_progress"];
-  const attention = scope
-    .filter((i) => attnStatuses.includes(i.status))
-    .sort(
-      (a, b) =>
-        attnStatuses.indexOf(a.status) - attnStatuses.indexOf(b.status) ||
-        (b.updatedAt || 0) - (a.updatedAt || 0)
-    )
-    .slice(0, 8);
+  // Only the items needing THIS user's action, most urgent first.
+  const attention = myAttention(db.inspections, user).slice(0, 8);
 
   return (
     <div>

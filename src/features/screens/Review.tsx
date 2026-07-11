@@ -19,7 +19,7 @@ type SheetState =
 
 export function Review() {
   const { insp, save, catalog } = useInspection();
-  const { user, removeInspection } = useStore();
+  const { user, db, removeInspection } = useStore();
   const { t, nm, lang } = useI18n();
   const toast = useToast();
   const { navigate, back } = useNav();
@@ -211,6 +211,29 @@ export function Review() {
             <span>{t("total")}</span>
             <span className="money">{money(tot.price)}</span>
           </div>
+        </div>
+      )}
+
+      {/* ---- Office/admin: (re)assign the job to a tech ---- */}
+      {isOffice && insp.status !== "completed" && db.users.length > 0 && (
+        <div className="card noprint">
+          <label className="f" style={{ marginTop: 0 }}>{t("assignedTo")}</label>
+          <select
+            className="t"
+            value={insp.techId || ""}
+            onChange={(e) => {
+              const u = db.users.find((x) => x.id === e.target.value);
+              if (u) {
+                save({ ...insp, tech: u.name, techId: u.id });
+                toast(t("reassigned"));
+              }
+            }}
+          >
+            {!insp.techId && <option value="">—</option>}
+            {db.users.map((u) => (
+              <option key={u.id} value={u.id}>{u.name} · {t("role_" + u.role)}</option>
+            ))}
+          </select>
         </div>
       )}
 

@@ -6,6 +6,7 @@ import { screenTitle } from "./titles";
 import { HelpButton } from "./help";
 import { ThemePicker } from "./ThemePicker";
 import { newInspectionDraft } from "@/lib/data/factory";
+import { myAttention } from "@/lib/data/status";
 import {
   IconHome, IconInbox, IconGrid, IconUsers, IconBook, IconPlus, IconGlobe, IconLogout, IconBriefcase,
 } from "@/components/icons";
@@ -13,12 +14,13 @@ import {
 /* Desktop operations shell for office/admin — sidebar + topbar, from the
    company Design System app kit. Field techs / phones use the mobile shell. */
 export function DeskShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
+  const { user, db, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
   const { t } = useI18n();
   const { view, navigate } = useNav();
   if (!user) return null;
 
   const isAdmin = !!user.permissions.editCatalog;
+  const attnCount = myAttention(db.inspections, user).length;
 
   const nav: { id: ViewName; label: string; Icon: typeof IconHome; show: boolean }[] = [
     { id: "home", label: t("dashboard"), Icon: IconHome, show: true },
@@ -60,6 +62,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
             >
               <span className="ico"><n.Icon size={18} /></span>
               <span style={{ flex: 1 }}>{n.label}</span>
+              {n.id === "home" && attnCount > 0 && <span className="navbadge">{attnCount}</span>}
             </button>
           ))}
         </nav>
