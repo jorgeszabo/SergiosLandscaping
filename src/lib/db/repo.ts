@@ -3,10 +3,16 @@
    place that knows SQL. Mirrors the client store so a work order / inspection
    round-trips without transformation (integration seam friendly, §7).
    --------------------------------------------------------------------------- */
+import { randomBytes } from "node:crypto";
 import { getSql } from "./client";
-import { ensureInitialized, DEFAULT_PASSWORD } from "./init";
+import { ensureInitialized } from "./init";
 import { verifyPassword, hashPassword } from "@/lib/auth/password";
 import type { Catalog, Customer, Inspection, User } from "@/lib/data/types";
+
+// A precomputed dummy hash so a login for an unknown user still spends the same
+// bcrypt time as a real one — removes the user-enumeration timing oracle.
+let dummyHash: Promise<string> | null = null;
+const getDummyHash = () => (dummyHash ??= hashPassword("timing-equalizer"));
 
 function rowToUser(r: Record<string, unknown>, withHash = false): User {
   const u: User = {
@@ -31,7 +37,10 @@ export async function verifyLogin(userId: string, password: string): Promise<Use
   await ensureInitialized();
   const sql = getSql();
   const rows = await sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1`;
-  if (!rows.length) return null;
+  if (!rows.length) {
+    await verifyPassword(password, await getDummyHash()); // constant-time
+    return null;
+  }
   const withHash = rowToUser(rows[0], true);
   const ok = await verifyPassword(password, withHash.passwordHash || "");
   if (!ok) return null;
@@ -56,7 +65,9 @@ export async function upsertUser(user: User, password?: string): Promise<void> {
   } else if (existing.length) {
     hash = existing[0].password_hash as string; // keep current password
   } else {
-    hash = await hashPassword(DEFAULT_PASSWORD); // new user, no password → default
+    // New user with no password supplied: assign a random one (no shared
+    // default). The admin sets/generates a real password in Team.
+    hash = await hashPassword(randomBytes(18).toString("base64url"));
   }
   await sql`
     INSERT INTO users (id, name, role, lang, permissions, password_hash)

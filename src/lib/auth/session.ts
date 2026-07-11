@@ -15,11 +15,33 @@ import { databaseUrl } from "@/lib/db/client";
 export const SESSION_COOKIE = "sergios_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+let warnedFallback = false;
+
 function secret(): Uint8Array {
   const explicit = process.env.AUTH_SECRET;
-  const base = explicit && explicit.length >= 16 ? explicit : databaseUrl() || "dev-insecure-secret";
-  // Normalize to 32 bytes for HS256.
-  return new Uint8Array(createHash("sha256").update(base).digest());
+  if (explicit && explicit.length >= 16) {
+    return new Uint8Array(createHash("sha256").update(explicit).digest());
+  }
+  const dbUrl = databaseUrl();
+  if (process.env.NODE_ENV === "production") {
+    // Keep the app working if AUTH_SECRET wasn't set, but never use a hardcoded
+    // key in production, and warn loudly to set a dedicated secret.
+    if (!dbUrl) {
+      throw new Error(
+        "AUTH_SECRET is required in production (generate one with: openssl rand -base64 32)."
+      );
+    }
+    if (!warnedFallback) {
+      warnedFallback = true;
+      console.warn(
+        "[auth] AUTH_SECRET is unset or too short — deriving the session key from the database URL. " +
+          "Set AUTH_SECRET (openssl rand -base64 32) for a dedicated signing key."
+      );
+    }
+    return new Uint8Array(createHash("sha256").update(dbUrl).digest());
+  }
+  // Local/dev fallback only.
+  return new Uint8Array(createHash("sha256").update(dbUrl || "dev-insecure-secret").digest());
 }
 
 export async function signSession(userId: string): Promise<string> {

@@ -26,6 +26,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "bad request" }, { status: 400 });
   }
   if (!insp?.id) return NextResponse.json({ error: "missing id" }, { status: 400 });
+  // The approval gate is enforced server-side, not just in the UI: only a user
+  // with the `approve` permission may push an inspection into a work-order
+  // state. Field capture (draft/submitted/under_review/returned) is unrestricted.
+  const isWorkOrderState =
+    insp.status === "approved" || insp.status === "in_progress" || insp.status === "completed";
+  if (isWorkOrderState && !user.permissions.approve) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
   const applied = await upsertInspection(insp);
   if (!applied) {
     // A newer version exists on the server — signal a conflict so the client

@@ -46,11 +46,11 @@ steps are on your side (I can't set secrets in your Vercel account):
    Vercel dashboard → your project → **Storage** → connect your Neon Postgres.
    This automatically sets `DATABASE_URL` in the project. *(This is the one
    thing only you can do — it needs your account.)*
-3. **(Optional but recommended) Set `AUTH_SECRET`.**
+3. **Set `AUTH_SECRET`** (strongly recommended).
    Project → **Settings → Environment Variables** → add `AUTH_SECRET`.
-   Generate a value with `openssl rand -base64 32`. If you skip this, sessions
-   are still signed (with a key derived from the database URL); setting it is
-   just cleaner.
+   Generate a value with `openssl rand -base64 32`. If you skip it the app still
+   runs — in production it derives a key from the database URL and logs a warning
+   — but a dedicated secret is the right way to sign sessions, so set it.
 4. **Redeploy** (Vercel does this automatically when you add env vars, or click
    **Redeploy**).
 
