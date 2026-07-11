@@ -248,6 +248,7 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     recent: "Recent",
     viewAll: "View all",
     needsAttention: "Needs your attention",
+    allCaughtUp: "You're all caught up.",
     nothingHere: "Nothing here yet.",
     // training / demo mode
     trainingMode: "Training mode",
@@ -559,6 +560,7 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     recent: "Recientes",
     viewAll: "Ver todo",
     needsAttention: "Requiere tu atención",
+    allCaughtUp: "Estás al día.",
     nothingHere: "Aún no hay nada aquí.",
     // training / demo mode
     trainingMode: "Modo de entrenamiento",

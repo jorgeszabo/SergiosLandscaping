@@ -18,8 +18,10 @@ export function Home() {
 
   const isOffice = user.role === "office" || user.role === "admin";
   const canSee = user.permissions.seePrices;
-  const count = (fn: (s: InspectionStatus) => boolean) =>
-    db.inspections.filter((i) => fn(i.status)).length;
+
+  // Office/admin handle everyone's work; field/lead see their own jobs.
+  const scope = isOffice ? db.inspections : db.inspections.filter((i) => i.techId === user.id);
+  const scount = (fn: (s: InspectionStatus) => boolean) => scope.filter((i) => fn(i.status)).length;
 
   const startNew = () => {
     const insp = newInspectionDraft(user);
@@ -34,21 +36,32 @@ export function Home() {
 
   const stats = isOffice
     ? [
-        { l: t("needsReview"), v: count((s) => s === "submitted" || s === "under_review" || s === "returned") },
-        { l: t("workOrders"), v: count((s) => s === "approved" || s === "in_progress") },
-        { l: t("st_completed"), v: count((s) => s === "completed") },
-        { l: t("inspections"), v: db.inspections.length },
+        { l: t("needsReview"), v: scount((s) => s === "submitted" || s === "under_review" || s === "returned") },
+        { l: t("workOrders"), v: scount((s) => s === "approved" || s === "in_progress") },
+        { l: t("st_completed"), v: scount((s) => s === "completed") },
+        { l: t("inspections"), v: scope.length },
       ]
     : [
-        { l: t("st_draft"), v: count((s) => s === "draft") },
-        { l: t("st_submitted"), v: count((s) => s === "submitted" || s === "under_review") },
-        { l: t("st_approved"), v: count((s) => s === "approved" || s === "in_progress") },
-        { l: t("inspections"), v: db.inspections.length },
+        { l: t("st_draft"), v: scount((s) => s === "draft") },
+        { l: t("st_returned"), v: scount((s) => s === "returned") },
+        { l: t("workOrders"), v: scount((s) => s === "approved" || s === "in_progress") },
+        { l: t("st_completed"), v: scount((s) => s === "completed") },
       ];
 
-  const recent = [...db.inspections]
-    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
-    .slice(0, isOffice ? 8 : 6);
+  // Only the items needing THIS user's action, most urgent first. Office:
+  // things to review then schedule. Field: rework, then finish drafts, then
+  // the work orders to go do.
+  const attnStatuses: InspectionStatus[] = isOffice
+    ? ["submitted", "under_review", "approved"]
+    : ["returned", "draft", "approved", "in_progress"];
+  const attention = scope
+    .filter((i) => attnStatuses.includes(i.status))
+    .sort(
+      (a, b) =>
+        attnStatuses.indexOf(a.status) - attnStatuses.indexOf(b.status) ||
+        (b.updatedAt || 0) - (a.updatedAt || 0)
+    )
+    .slice(0, 8);
 
   return (
     <div>
@@ -81,24 +94,25 @@ export function Home() {
         )}
       </div>
 
-      <h2>{isOffice ? t("needsAttention") : t("recent")}</h2>
+      <h2>{t("needsAttention")}</h2>
       <div className="card">
         <div className="list">
-          {recent.length === 0 && (
+          {attention.length === 0 && (
             <div className="empty">
-              <div className="big">{t("nothingHere")}</div>
+              <div className="big">{t("allCaughtUp")}</div>
               <div>{t("tapNew")}</div>
             </div>
           )}
-          {recent.map((insp) => {
+          {attention.map((insp) => {
             const tot = inspectionTotals(insp, db.catalog);
             const issues = insp.lines.filter((l) => l.kind === "issue").length;
+            const meta = [insp.address, isOffice ? insp.tech : ""].filter(Boolean).join(" · ");
             return (
               <button key={insp.id} className="item" onClick={() => openInsp(insp)}>
                 <ListAvatar />
                 <div className="g">
                   <div className="n">{insp.customer || "—"}</div>
-                  <div className="m">{[insp.address, insp.tech].filter(Boolean).join(" · ")} · {issues} {t("issuesWord")}</div>
+                  <div className="m">{[meta, `${issues} ${t("issuesWord")}`].filter(Boolean).join(" · ")}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   {canSee && <div className="money">{money(tot.price)}</div>}

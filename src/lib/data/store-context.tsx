@@ -289,7 +289,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (mode === "server") {
         const u = await apiLogin(userId, password || "");
         setUser(u);
-        setLangState(u.lang);
+        // Keep the language chosen on the login screen — don't override it with
+        // the account's stored preference.
         const state = await fetchState();
         commit({
           ...dbRef.current,
@@ -298,19 +299,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           customers: state.customers,
           inspections: mergeInspections(dbRef.current.inspections, state.inspections),
           session: u.id,
-          settings: { ...dbRef.current.settings, lang: u.lang },
         });
         setSyncState("synced");
       } else {
         const u = dbRef.current.users.find((x) => x.id === userId);
         if (!u) throw new Error("unknown user");
         setUser(u);
-        setLangState(u.lang);
-        commit({
-          ...dbRef.current,
-          session: u.id,
-          settings: { ...dbRef.current.settings, lang: u.lang },
-        });
+        commit({ ...dbRef.current, session: u.id });
       }
     },
     [mode, commit]
