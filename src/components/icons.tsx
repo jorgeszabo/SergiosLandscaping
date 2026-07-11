@@ -78,3 +78,12 @@ export const IconChart = (p: P) => (
 export const IconBook = (p: P) => (
   <Svg {...p}><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></Svg>
 );
+export const IconContrast = (p: P) => (
+  <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" /></Svg>
+);
+export const IconMoon = (p: P) => (
+  <Svg {...p}><path d="M20 14.3A8 8 0 1 1 9.7 4 6.5 6.5 0 0 0 20 14.3z" /></Svg>
+);
+export const IconSun = (p: P) => (
+  <Svg {...p}><circle cx="12" cy="12" r="4" /><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8" /></Svg>
+);
