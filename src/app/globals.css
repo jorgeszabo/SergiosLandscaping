@@ -189,7 +189,39 @@ input.t:focus, select.t:focus, textarea.t:focus { outline: 3px solid var(--focus
 .syncpill.synced { background: var(--success-soft); color: var(--success); }
 .syncpill.pending { background: var(--info-soft); color: var(--info); }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface-inverse); color: #fff; padding: 11px 18px; border-radius: var(--radius-pill); font-size: 14px; z-index: 99; box-shadow: var(--shadow-lg); }
+.toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: var(--surface-inverse); color: #fff; padding: 11px 18px; border-radius: var(--radius-pill); font-size: 14px; z-index: 99; box-shadow: var(--shadow-lg); }
+
+.iconbtn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: var(--radius-md); border: none; background: transparent; color: inherit; }
+.iconbtn:hover { background: var(--surface-sunken); }
+.mtopbar .iconbtn:hover, header.bar .iconbtn:hover { background: rgba(255,255,255,.16); }
+
+/* ===========================================================================
+   Mobile shell — minimal top bar + bottom tab navigation (field + narrow)
+   =========================================================================== */
+.mshell { max-width: 760px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+.mtopbar {
+  position: sticky; top: 0; z-index: 10; background: var(--brand-primary); color: #fff;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top));
+}
+.mtopbar .mlogo { height: 26px; width: auto; background: #fff; border-radius: 5px; padding: 3px 6px; display: block; }
+.mtopbar .mtitle { flex: 1; font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
+.mtopbar .iconbtn { color: #fff; }
+.mmain { flex: 1; padding: 16px; padding-bottom: 84px; }
+
+.tabbar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  background: var(--surface-card); border-top: 1px solid var(--border-subtle);
+  display: flex; justify-content: space-around; align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom);
+  max-width: 760px; margin: 0 auto;
+  box-shadow: 0 -2px 12px rgba(26,24,21,.05);
+}
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 9px 4px 8px; border: none; background: none; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+.tab.on { color: var(--brand-primary); }
+.tab.fab { color: #fff; }
+.tab.fab .fabc { width: 46px; height: 46px; border-radius: 50%; background: var(--brand-accent); display: flex; align-items: center; justify-content: center; margin-top: -18px; box-shadow: var(--shadow-md); }
+.tab.fab span:last-child { color: var(--text-muted); }
 
 /* ===========================================================================
    Desktop office shell (sidebar + topbar) — from the DS app UI kit.

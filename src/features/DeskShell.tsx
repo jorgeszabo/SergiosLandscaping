@@ -2,44 +2,37 @@
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
 import { useNav, type ViewName } from "./nav";
+import { screenTitle } from "./titles";
+import { HelpButton } from "./help";
 import { uid } from "@/lib/data/id";
 import type { Inspection } from "@/lib/data/types";
+import {
+  IconHome, IconInbox, IconGrid, IconUsers, IconBook, IconPlus, IconGlobe, IconLogout,
+} from "@/components/icons";
 
 /* Desktop operations shell for office/admin — sidebar + topbar, from the
-   company Design System app kit. Field techs use the mobile shell instead. */
+   company Design System app kit. Field techs / phones use the mobile shell. */
 export function DeskShell({ children }: { children: React.ReactNode }) {
   const { user, lang, setLang, logout, upsertInspection } = useStore();
   const { t } = useI18n();
   const { view, navigate } = useNav();
   if (!user) return null;
 
-  const isAdmin = user.permissions.editCatalog;
+  const isAdmin = !!user.permissions.editCatalog;
 
-  const nav: { id: ViewName; label: string; ico: string; show: boolean }[] = [
-    { id: "office", label: t("navQueue"), ico: "🗂", show: true },
-    { id: "catalog", label: t("navCatalog"), ico: "⚙︎", show: !!isAdmin },
-    { id: "team", label: t("navTeam"), ico: "👥", show: !!isAdmin },
+  const nav: { id: ViewName; label: string; Icon: typeof IconHome; show: boolean }[] = [
+    { id: "home", label: t("dashboard"), Icon: IconHome, show: true },
+    { id: "office", label: t("navQueue"), Icon: IconInbox, show: true },
+    { id: "catalog", label: t("navCatalog"), Icon: IconGrid, show: isAdmin },
+    { id: "team", label: t("navTeam"), Icon: IconUsers, show: isAdmin },
+    { id: "guide", label: t("userGuide"), Icon: IconBook, show: true },
   ];
-
-  const titleFor = (v: ViewName): string => {
-    switch (v) {
-      case "home": return t("queue");
-      case "office": return t("queue");
-      case "catalog": return t("catTitle");
-      case "team": return t("manageTeam");
-      case "review": return t("reviewApprove");
-      case "print": return t("proposal");
-      default: return t("inspections");
-    }
-  };
 
   const startNew = () => {
     const insp: Inspection = {
-      id: uid(),
-      customer: "", address: "", city: "",
+      id: uid(), customer: "", address: "", city: "",
       tech: user.name, techId: user.id,
-      date: new Date().toISOString().slice(0, 10),
-      status: "draft",
+      date: new Date().toISOString().slice(0, 10), status: "draft",
       snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
       zones: [], lines: [],
     };
@@ -48,7 +41,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
   };
 
   const active = (id: ViewName) =>
-    id === view.name || (id === "office" && ["home", "review", "print"].includes(view.name));
+    id === view.name || (id === "office" && ["review", "print"].includes(view.name));
 
   return (
     <div className="deskshell">
@@ -61,7 +54,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <button className="btn pri block" style={{ marginBottom: 14 }} onClick={startNew}>
-          ＋ {t("newInsp")}
+          <IconPlus size={18} /> {t("newInsp")}
         </button>
         <nav>
           {nav.filter((n) => n.show).map((n) => (
@@ -70,7 +63,7 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
               className={active(n.id) ? "on" : ""}
               onClick={() => navigate({ name: n.id, ...(n.id === "catalog" ? { tab: "parts" } : {}) })}
             >
-              <span className="ico">{n.ico}</span>
+              <span className="ico"><n.Icon size={18} /></span>
               <span style={{ flex: 1 }}>{n.label}</span>
             </button>
           ))}
@@ -83,16 +76,24 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
             style={{ marginTop: 8, color: "var(--text-muted)" }}
             onClick={() => void logout()}
           >
-            {t("logout")}
+            <IconLogout size={16} /> {t("logout")}
           </button>
         </div>
       </aside>
 
       <div className="deskmain">
         <header className="topbar noprint">
-          <h1>{titleFor(view.name)}</h1>
-          <div className="row" style={{ gap: 8 }}>
-            <button className="chip" onClick={() => setLang(lang === "es" ? "en" : "es")}>
+          <h1>{screenTitle(view.name, t, true)}</h1>
+          <div className="row" style={{ gap: 6 }}>
+            <HelpButton view={view.name} />
+            <button
+              className="chip"
+              aria-label="Language"
+              onClick={() => setLang(lang === "es" ? "en" : "es")}
+              title={t("langPref")}
+              style={{ gap: 6 }}
+            >
+              <IconGlobe size={16} />
               {lang === "es" ? "ES" : "EN"}
             </button>
           </div>

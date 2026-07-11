@@ -26,6 +26,7 @@ import type {
   User,
 } from "./types";
 import { freshDatabase } from "./seed";
+import { demoCustomers, demoInspections, DEMO_PREFIX } from "./demo";
 import { idbLoad, idbSave, idbReset } from "./local-db";
 import {
   serverConfigured,
@@ -63,6 +64,8 @@ interface StoreValue {
   addCustomer: (c: Customer) => void;
   saveUser: (user: User, password?: string) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  loadDemo: () => void;
+  clearDemo: () => void;
   resetLocal: () => Promise<void>;
 }
 
@@ -329,6 +332,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [mode, commit]
   );
 
+  const loadDemo = useCallback(() => {
+    const custs = demoCustomers();
+    const insps = demoInspections(Date.now());
+    const haveC = new Set(dbRef.current.customers.map((c) => c.id));
+    const haveI = new Set(dbRef.current.inspections.map((i) => i.id));
+    commit({
+      ...dbRef.current,
+      customers: [...custs.filter((c) => !haveC.has(c.id)), ...dbRef.current.customers],
+      // demo records are local-only (synced:true so the sync flush leaves them alone)
+      inspections: [...insps.filter((i) => !haveI.has(i.id)), ...dbRef.current.inspections],
+    });
+  }, [commit]);
+
+  const clearDemo = useCallback(() => {
+    commit({
+      ...dbRef.current,
+      customers: dbRef.current.customers.filter((c) => !c.id.startsWith(DEMO_PREFIX)),
+      inspections: dbRef.current.inspections.filter((i) => !i.id.startsWith(DEMO_PREFIX)),
+    });
+  }, [commit]);
+
   const resetLocal = useCallback(async () => {
     await idbReset();
     const fresh = freshDatabase();
@@ -356,6 +380,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addCustomer,
     saveUser,
     deleteUser,
+    loadDemo,
+    clearDemo,
     resetLocal,
   };
 

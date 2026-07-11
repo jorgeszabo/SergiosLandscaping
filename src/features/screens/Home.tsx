@@ -5,7 +5,15 @@ import { useNav } from "../nav";
 import { SyncStatus } from "@/components/SyncStatus";
 import { inspectionTotals, money } from "@/lib/money/engine";
 import { uid } from "@/lib/data/id";
-import type { Inspection } from "@/lib/data/types";
+import { IconPlus, IconInbox, IconClipboard } from "@/components/icons";
+import type { Inspection, InspectionStatus } from "@/lib/data/types";
+
+const badgeTone = (s: InspectionStatus): string => {
+  if (s === "completed") return "done";
+  if (s === "approved" || s === "in_progress") return "navy";
+  if (s === "returned") return "red";
+  return "new";
+};
 
 export function Home() {
   const { db, user, upsertInspection } = useStore();
@@ -14,93 +22,114 @@ export function Home() {
   if (!user) return null;
 
   const isOffice = user.role === "office" || user.role === "admin";
+  const canSee = user.permissions.seePrices;
+  const count = (fn: (s: InspectionStatus) => boolean) =>
+    db.inspections.filter((i) => fn(i.status)).length;
 
   const startNew = () => {
     const insp: Inspection = {
-      id: uid(),
-      customer: "",
-      address: "",
-      city: "",
-      tech: user.name,
-      techId: user.id,
-      date: new Date().toISOString().slice(0, 10),
-      status: "draft",
+      id: uid(), customer: "", address: "", city: "",
+      tech: user.name, techId: user.id,
+      date: new Date().toISOString().slice(0, 10), status: "draft",
       snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
-      zones: [],
-      lines: [],
+      zones: [], lines: [],
     };
     upsertInspection(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
 
+  const openInsp = (insp: Inspection) => {
+    if (isOffice) navigate({ name: "review", inspId: insp.id });
+    else navigate({ name: insp.zones.length ? "zones" : "newJob", inspId: insp.id });
+  };
+
+  const stats = isOffice
+    ? [
+        { l: t("needsReview"), v: count((s) => s === "submitted" || s === "under_review" || s === "returned") },
+        { l: t("workOrders"), v: count((s) => s === "approved" || s === "in_progress") },
+        { l: t("st_completed"), v: count((s) => s === "completed") },
+        { l: t("inspections"), v: db.inspections.length },
+      ]
+    : [
+        { l: t("st_draft"), v: count((s) => s === "draft") },
+        { l: t("st_submitted"), v: count((s) => s === "submitted" || s === "under_review") },
+        { l: t("st_approved"), v: count((s) => s === "approved" || s === "in_progress") },
+        { l: t("inspections"), v: db.inspections.length },
+      ];
+
+  const recent = [...db.inspections]
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+    .slice(0, isOffice ? 8 : 6);
+
   return (
     <div>
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1>{t("inspections")}</h1>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+        <div>
+          <h1 style={{ margin: 0 }}>{t("goodDay")}, {user.name}</h1>
+          <p className="sub" style={{ margin: 0 }}>{t("role_" + user.role)}</p>
+        </div>
         <SyncStatus />
       </div>
-      <p className="sub">
-        {user.name} · {t("role_" + user.role)}
-      </p>
 
-      <button className="btn pri block" onClick={startNew}>
-        ＋ {t("newInsp")}
-      </button>
+      <div className="statgrid" style={{ marginTop: 16 }}>
+        {stats.map((s, i) => (
+          <div className="statcard" key={i}>
+            <div className="l">{s.l}</div>
+            <div className="v">{s.v}</div>
+          </div>
+        ))}
+      </div>
 
-      {isOffice && (
-        <button className="btn block" style={{ marginTop: 8 }} onClick={() => navigate({ name: "office" })}>
-          🗂️ {t("openOffice")}
+      <h2>{t("quickActions")}</h2>
+      <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+        <button className="btn pri" onClick={startNew} style={{ flex: "1 1 160px" }}>
+          <IconPlus size={18} /> {t("newInsp")}
         </button>
-      )}
+        {isOffice && (
+          <button className="btn" onClick={() => navigate({ name: "office" })} style={{ flex: "1 1 160px" }}>
+            <IconInbox size={18} /> {t("openOffice")}
+          </button>
+        )}
+      </div>
 
-      <div className="card" style={{ marginTop: 14 }}>
+      <h2>{isOffice ? t("needsAttention") : t("recent")}</h2>
+      <div className="card">
         <div className="list">
-          {db.inspections.length === 0 && (
+          {recent.length === 0 && (
             <div className="empty">
-              <div className="big">{t("noInsp")}</div>
+              <div className="big">{t("nothingHere")}</div>
               <div>{t("tapNew")}</div>
             </div>
           )}
-          {db.inspections.map((insp) => {
+          {recent.map((insp) => {
             const tot = inspectionTotals(insp, db.catalog);
             const issues = insp.lines.filter((l) => l.kind === "issue").length;
-            const approved = insp.status === "approved";
             return (
-              <button
-                key={insp.id}
-                className="item"
-                onClick={() =>
-                  navigate({ name: insp.zones.length ? "zones" : "newJob", inspId: insp.id })
-                }
-              >
+              <button key={insp.id} className="item" onClick={() => openInsp(insp)}>
+                <span
+                  style={{
+                    width: 34, height: 34, borderRadius: 8, flex: "none",
+                    background: "var(--brand-primary-soft)", color: "var(--brand-primary)",
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  <IconClipboard size={18} />
+                </span>
                 <div className="g">
                   <div className="n">{insp.customer || "—"}</div>
-                  <div className="m">
-                    {[insp.address, insp.tech, insp.date].filter(Boolean).join(" · ")}
-                  </div>
+                  <div className="m">{[insp.address, insp.tech].filter(Boolean).join(" · ")} · {issues} {t("issuesWord")}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  {user.permissions.seePrices && <div className="money">{money(tot.price)}</div>}
-                  <div className="m" style={{ fontSize: 12, color: "var(--muted)" }}>
-                    {issues} {t("issuesWord")}
-                  </div>
+                  {canSee && <div className="money">{money(tot.price)}</div>}
+                  <span className={`badge ${badgeTone(insp.status)}`} style={{ marginTop: 3 }}>
+                    {t("st_" + insp.status)}
+                  </span>
                 </div>
-                <span className={`badge ${approved ? "done" : "new"}`}>{approved ? "✓" : "•"}</span>
               </button>
             );
           })}
         </div>
       </div>
-
-      {user.permissions.editCatalog && (
-        <button
-          className="btn block ghost"
-          style={{ marginTop: 2 }}
-          onClick={() => navigate({ name: "catalog", tab: "parts" })}
-        >
-          ⚙︎ {t("catalog")}
-        </button>
-      )}
     </div>
   );
 }
