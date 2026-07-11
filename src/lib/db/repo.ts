@@ -115,6 +115,12 @@ export async function addCustomer(c: Customer): Promise<void> {
       contact = EXCLUDED.contact`;
 }
 
+export async function deleteCustomer(id: string): Promise<void> {
+  await ensureInitialized();
+  const sql = getSql();
+  await sql`DELETE FROM customers WHERE id = ${id}`;
+}
+
 export async function listInspections(): Promise<Inspection[]> {
   await ensureInitialized();
   const sql = getSql();

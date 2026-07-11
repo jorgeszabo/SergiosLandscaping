@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
+import { IconTrash, IconSearch } from "@/components/icons";
 import type { Lang, Permissions, Role, User } from "@/lib/data/types";
 
 const ROLES: Role[] = ["field", "lead", "office", "admin"];
@@ -29,10 +30,11 @@ const genPassword = () =>
   `${WORDS[Math.floor(Math.random() * WORDS.length)]}-${Math.floor(1000 + Math.random() * 9000)}`;
 
 export function Team() {
-  const { db, user, saveUser, deleteUser, loadDemo, clearDemo } = useStore();
+  const { db, user, saveUser, deleteUser, deleteCustomer, loadDemo, clearDemo } = useStore();
   const { t } = useI18n();
   const toast = useToast();
 
+  const [custQuery, setCustQuery] = useState("");
   const [editing, setEditing] = useState<User | "new" | null>(null);
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -220,6 +222,59 @@ export function Team() {
             );
           })}
         </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ marginTop: 0 }}>{t("customersHdr")}</h2>
+        <p className="sub" style={{ marginTop: 0 }}>{t("customersHint")}</p>
+        <div style={{ position: "relative", marginBottom: 10 }}>
+          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", display: "flex" }}>
+            <IconSearch size={16} />
+          </span>
+          <input
+            className="t"
+            style={{ paddingLeft: 36 }}
+            placeholder={t("searchCustomers")}
+            value={custQuery}
+            onChange={(e) => setCustQuery(e.target.value)}
+          />
+        </div>
+        {(() => {
+          const q = custQuery.trim().toLowerCase();
+          const list = db.customers.filter(
+            (c) =>
+              !q ||
+              c.name.toLowerCase().includes(q) ||
+              (c.address || "").toLowerCase().includes(q) ||
+              (c.city || "").toLowerCase().includes(q)
+          );
+          if (db.customers.length === 0) return <p className="sub" style={{ margin: 0 }}>{t("noCustomers")}</p>;
+          if (list.length === 0) return <p className="sub" style={{ margin: 0 }}>{t("noCustomerMatch")}</p>;
+          return (
+            <div className="list">
+              {list.map((c) => (
+                <div key={c.id} className="item" style={{ cursor: "default" }}>
+                  <div className="g">
+                    <div className="n">{c.name}</div>
+                    <div className="m">{[c.address, c.city].filter(Boolean).join(" · ") || "—"}</div>
+                  </div>
+                  <button
+                    className="iconbtn"
+                    title={t("removeCustomer")}
+                    aria-label={t("removeCustomer")}
+                    onClick={async () => {
+                      if (!window.confirm(t("confirmRemoveCustomer"))) return;
+                      await deleteCustomer(c.id);
+                      toast(t("customerRemoved"));
+                    }}
+                  >
+                    <IconTrash size={17} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>
