@@ -69,6 +69,50 @@ export const SEED_PARTS: Part[] = [
   P("wire_conn", "Waterproof wire connectors", "Conectores de cable impermeables", { category: "Wire & Electrical", brand: "3M", model: "DBR/Y-6", vendor: "SiteOne", sku: "DBRY6", unit: "each", cost: 1, price: 4 }),
   P("vbox_6", 'Valve box 6" round', 'Caja de válvula 6" redonda', { category: "Valve Box", brand: "NDS", model: "111BC", vendor: "SiteOne", sku: "111BC", unit: "each", cost: 8, price: 20 }),
   P("vbox_10", 'Valve box 10" rectangular', 'Caja de válvula 10" rectangular', { category: "Valve Box", brand: "NDS", model: "113BC", vendor: "SiteOne", sku: "113BC", unit: "each", cost: 14, price: 32, onHand: false }),
+
+  // ── expanded popular components ──────────────────────────────────────────
+  // Controllers
+  P("ctrl_hydrawise", "Smart Wi-Fi controller", "Controlador inteligente Wi-Fi", { category: "Controller", brand: "Hunter", model: "Hydrawise HC", vendor: "Ewing", sku: "HC-1200i", unit: "each", cost: 160, price: 280, onHand: false, notes: "Wi-Fi / app control" }),
+  P("ctrl_espme", "Modular controller — up to 22", "Controlador modular — hasta 22", { category: "Controller", brand: "Rain Bird", model: "ESP-Me3", vendor: "SiteOne", sku: "ESP4ME3", unit: "each", cost: 130, price: 230, onHand: false }),
+  P("ctrl_transformer", "Controller transformer 24V", "Transformador de controlador 24V", { category: "Controller", brand: "Generic", unit: "each", cost: 14, price: 35, onHand: false }),
+  // Backflow
+  P("bf_rp", 'Reduced-pressure assembly 1"', 'Válvula de presión reducida 1"', { category: "Backflow", brand: "Watts", model: "009-1", vendor: "SiteOne", sku: "0062033", unit: "each", cost: 150, price: 260, onHand: false, notes: "RP — high-hazard" }),
+  P("bf_ball", 'Ball valve 1"', 'Válvula de bola 1"', { category: "Backflow", brand: "Generic", vendor: "SiteOne", unit: "each", cost: 8, price: 20 }),
+  // Valves
+  P("valve_075", 'Electric valve 3/4"', 'Válvula eléctrica 3/4"', { category: "Valve", brand: "Hunter", model: "PGV-075", vendor: "Ewing", sku: "PGV-075", unit: "each", cost: 15, price: 33, onHand: false }),
+  P("valve_150", 'Electric valve 1-1/2"', 'Válvula eléctrica 1-1/2"', { category: "Valve", brand: "Rain Bird", model: "PEB-150", vendor: "SiteOne", sku: "PEB150", unit: "each", cost: 45, price: 85, onHand: false, notes: "Larger mainline zones" }),
+  P("valve_master", "Master valve", "Válvula maestra", { category: "Valve", brand: "Hunter", model: "ICV-101G", vendor: "Ewing", unit: "each", cost: 40, price: 80, onHand: false }),
+  P("valve_diaphragm", "Valve diaphragm/repair kit", "Kit de diafragma / reparación de válvula", { category: "Valve", brand: "Hunter", model: "PGV diaphragm", vendor: "Ewing", unit: "each", cost: 6, price: 16, notes: "Common repair item" }),
+  // Sensors
+  P("flow_sensor", "Flow sensor", "Sensor de flujo", { category: "Sensor", brand: "Hunter", model: "HFS", vendor: "Ewing", unit: "each", cost: 90, price: 160, onHand: false }),
+  P("soil_sensor", "Soil moisture sensor", "Sensor de humedad del suelo", { category: "Sensor", brand: "Hunter", model: "Soil-Clik", vendor: "Ewing", unit: "each", cost: 60, price: 110, onHand: false }),
+  // Spray heads
+  P("spray_02", 'Pop-up spray body 2"', 'Aspersor emergente 2"', { category: "Spray Head", brand: "Hunter", model: "Pro-Spray PROS-02", vendor: "Ewing", sku: "PROS-02", unit: "each", cost: 2.5, price: 7, onHand: false }),
+  P("rb_1804", 'Pop-up spray body 4"', 'Aspersor emergente 4"', { category: "Spray Head", brand: "Rain Bird", model: "1804", vendor: "SiteOne", sku: "1804", unit: "each", cost: 3, price: 8 }),
+  P("shrub_adapter", "Shrub riser adapter", "Adaptador para arbusto", { category: "Spray Head", brand: "Generic", vendor: "Ewing", unit: "each", cost: 1, price: 4, onHand: false }),
+  // Spray nozzles
+  P("van_nozzle", "Adjustable (VAN) nozzle", "Boquilla ajustable (VAN)", { category: "Spray Nozzle", brand: "Rain Bird", model: "VAN", vendor: "SiteOne", sku: "10-VAN", unit: "each", cost: 1.25, price: 5 }),
+  P("fixed_set", "Fixed nozzle set (¼/½/full)", "Juego de boquillas fijas (¼/½/completo)", { category: "Spray Nozzle", brand: "Rain Bird", model: "U-Series", vendor: "SiteOne", unit: "set", cost: 4, price: 12, onHand: false, notes: "High-uniformity" }),
+  P("mp_1000", "MP Rotator MP1000", "Boquilla MP Rotator MP1000", { category: "Spray Nozzle", brand: "Hunter", model: "MP1000", vendor: "Ewing", sku: "MP100021036", unit: "each", cost: 6, price: 14, onHand: false }),
+  P("mp_3000", "MP Rotator MP3000", "Boquilla MP Rotator MP3000", { category: "Spray Nozzle", brand: "Hunter", model: "MP3000", vendor: "Ewing", sku: "MP300090210", unit: "each", cost: 6.5, price: 15, onHand: false }),
+  P("side_strip", "Side/end strip nozzle", "Boquilla de tira", { category: "Spray Nozzle", brand: "Hunter", model: "Side Strip", vendor: "Ewing", unit: "each", cost: 1.5, price: 5, onHand: false }),
+  // Rotors
+  P("rotor_i20", "Rotor (I-20)", "Rotor (I-20)", { category: "Rotor", brand: "Hunter", model: "I-20", vendor: "Ewing", sku: "I-20-ADV", unit: "each", cost: 12, price: 28, onHand: false }),
+  P("rotor_3500", "Rotor (3500)", "Rotor (3500)", { category: "Rotor", brand: "Rain Bird", model: "3500", vendor: "SiteOne", sku: "3504", unit: "each", cost: 9, price: 22, onHand: false }),
+  // Drip
+  P("drip_pr", "Drip pressure regulator", "Regulador de presión para goteo", { category: "Drip", brand: "Rain Bird", model: "PRF-075", vendor: "SiteOne", unit: "each", cost: 6, price: 16, notes: "With filter" }),
+  P("drip_filter", "Drip filter / Y-strainer", "Filtro para goteo", { category: "Drip", brand: "Rain Bird", vendor: "SiteOne", unit: "each", cost: 5, price: 14, onHand: false }),
+  P("drip_14", 'Distribution tubing 1/4"', 'Tubería de distribución 1/4"', { category: "Drip", brand: "Rain Bird", vendor: "SiteOne", unit: "ft", cost: 0.15, price: 0.75, onHand: false, notes: "Priced per foot" }),
+  P("goof_plug", "Goof plugs (bag)", "Tapones (bolsa)", { category: "Drip", brand: "Generic", vendor: "Ewing", unit: "each", cost: 2, price: 6, onHand: false }),
+  P("drip_fittings", "Drip barbed fittings", "Conexiones dentadas para goteo", { category: "Drip", brand: "Generic", vendor: "SiteOne", unit: "each", cost: 0.4, price: 2 }),
+  // Pipe & fittings
+  P("poly_pipe", "Poly lateral pipe", "Tubo de polietileno", { category: "Pipe & Fittings", model: "100 psi", vendor: "SiteOne", unit: "ft", cost: 0.35, price: 1.1, onHand: false, notes: "Priced per foot" }),
+  P("pvc_cement", "PVC primer & cement", "Primer y cemento PVC", { category: "Pipe & Fittings", brand: "Oatey", vendor: "SiteOne", unit: "each", cost: 12, price: 26, notes: "Per can set" }),
+  P("pvc_riser", "PVC riser / nipple", "Niple / elevador PVC", { category: "Pipe & Fittings", vendor: "SiteOne", unit: "each", cost: 0.5, price: 2.5 }),
+  P("pvc_tee", "PVC tee / ell (assorted)", "Tee / codo PVC surtido", { category: "Pipe & Fittings", model: "Sch 40", vendor: "SiteOne", unit: "each", cost: 0.8, price: 3.5, onHand: false }),
+  // Consumables
+  P("teflon", "Teflon tape", "Cinta de teflón", { category: "Consumables", brand: "Generic", vendor: "SiteOne", unit: "each", cost: 0.5, price: 2 }),
+  P("marking_flags", "Marking flags (bundle)", "Banderas de marcado (paquete)", { category: "Consumables", vendor: "SiteOne", unit: "set", cost: 4, price: 10, onHand: false }),
 ];
 
 // ── labor rates (4) ──────────────────────────────────────────────────────────
