@@ -13,7 +13,8 @@ export type ViewName =
   | "review"
   | "print"
   | "catalog"
-  | "office";
+  | "office"
+  | "team";
 
 export interface View {
   name: ViewName;

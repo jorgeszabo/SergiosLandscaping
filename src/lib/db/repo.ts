@@ -4,8 +4,8 @@
    round-trips without transformation (integration seam friendly, §7).
    --------------------------------------------------------------------------- */
 import { getSql } from "./client";
-import { ensureInitialized } from "./init";
-import { verifyPassword } from "@/lib/auth/password";
+import { ensureInitialized, DEFAULT_PASSWORD } from "./init";
+import { verifyPassword, hashPassword } from "@/lib/auth/password";
 import type { Catalog, Customer, Inspection, User } from "@/lib/data/types";
 
 function rowToUser(r: Record<string, unknown>, withHash = false): User {
@@ -43,6 +43,33 @@ export async function getUserById(userId: string): Promise<User | null> {
   const sql = getSql();
   const rows = await sql`SELECT id, name, role, lang, permissions FROM users WHERE id = ${userId} LIMIT 1`;
   return rows.length ? rowToUser(rows[0]) : null;
+}
+
+export async function upsertUser(user: User, password?: string): Promise<void> {
+  await ensureInitialized();
+  const sql = getSql();
+  const perms = sql.json(user.permissions as unknown as Parameters<typeof sql.json>[0]);
+  const existing = await sql`SELECT password_hash FROM users WHERE id = ${user.id} LIMIT 1`;
+  let hash: string;
+  if (password && password.length > 0) {
+    hash = await hashPassword(password);
+  } else if (existing.length) {
+    hash = existing[0].password_hash as string; // keep current password
+  } else {
+    hash = await hashPassword(DEFAULT_PASSWORD); // new user, no password → default
+  }
+  await sql`
+    INSERT INTO users (id, name, role, lang, permissions, password_hash)
+    VALUES (${user.id}, ${user.name}, ${user.role}, ${user.lang}, ${perms}, ${hash})
+    ON CONFLICT (id) DO UPDATE SET
+      name = EXCLUDED.name, role = EXCLUDED.role, lang = EXCLUDED.lang,
+      permissions = EXCLUDED.permissions, password_hash = EXCLUDED.password_hash`;
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await ensureInitialized();
+  const sql = getSql();
+  await sql`DELETE FROM users WHERE id = ${id}`;
 }
 
 export async function getCatalog(): Promise<Catalog> {

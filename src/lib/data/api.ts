@@ -89,6 +89,22 @@ export async function pushCatalog(catalog: Catalog): Promise<void> {
   });
 }
 
+export async function saveUserApi(user: User, password?: string): Promise<void> {
+  await fetch("/api/users", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ user, password }),
+  }).then((r) => {
+    if (!r.ok) throw new Error("save user failed");
+  });
+}
+
+export async function deleteUserApi(id: string): Promise<void> {
+  await fetch(`/api/users/${encodeURIComponent(id)}`, { method: "DELETE" }).then((r) => {
+    if (!r.ok) throw new Error("delete user failed");
+  });
+}
+
 export async function pushCustomer(customer: Customer): Promise<void> {
   await fetch("/api/customers", {
     method: "POST",

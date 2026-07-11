@@ -18,8 +18,12 @@ export function Header() {
     <>
       <header className="bar noprint">
         <div className="brand">
-          <span>💧</span>
-          <span>{t("appName")}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" />
+          <span>
+            {t("appName")}{" "}
+            <small style={{ opacity: 0.75, fontWeight: 400 }}>· {t("moduleName")}</small>
+          </span>
         </div>
         <button
           className="drop"
@@ -61,6 +65,16 @@ export function Header() {
               }}
             >
               ⚙︎ {t("catalog")}
+            </button>
+          )}
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setMenu(false);
+                navigate({ name: "team" });
+              }}
+            >
+              👥 {t("manageTeam")}
             </button>
           )}
           <button

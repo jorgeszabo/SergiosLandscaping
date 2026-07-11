@@ -180,11 +180,17 @@ export interface Line {
   cost?: number;
 }
 
+/** Lifecycle: draft → (customer signs estimate) submitted → under_review →
+    approved (a work order) → in_progress → completed (customer signs completion).
+    `returned` sends it back to the tech for edits. Billing after completed is
+    handled by the back office, outside the app. */
 export type InspectionStatus =
   | "draft"
   | "submitted"
   | "under_review"
   | "approved"
+  | "in_progress"
+  | "completed"
   | "returned";
 
 export interface Inspection {
@@ -200,7 +206,10 @@ export interface Inspection {
   snapshot: SystemSnapshot;
   zones: Zone[];
   lines: Line[];
+  /** Customer signature approving the estimate (captured in the field). */
   signature?: string | null;
+  /** Customer signature confirming the completed work (captured on close-out). */
+  completionSignature?: string | null;
   /** Local-first sync bookkeeping. */
   updatedAt?: number;
   synced?: boolean;

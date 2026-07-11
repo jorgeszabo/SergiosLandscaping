@@ -31,7 +31,6 @@ export function Review() {
   const canEdit = user.permissions.setPrice;
   const canApprove = user.permissions.approve;
   const isOffice = user.role === "office" || user.role === "admin";
-  const approved = insp.status === "approved";
   const tot = inspectionTotals(insp, catalog);
 
   const setLineState = (lineId: string, state: LineState) => {
@@ -106,7 +105,23 @@ export function Review() {
       <button className="backlink noprint" onClick={back}>
         ‹ {t("zonesHub")}
       </button>
-      <h1>{isOffice ? t("review") : t("review")}</h1>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+        <h1 style={{ margin: 0 }}>{t("review")}</h1>
+        <span
+          className={`badge ${
+            insp.status === "completed"
+              ? "done"
+              : insp.status === "approved" || insp.status === "in_progress"
+                ? "navy"
+                : insp.status === "returned"
+                  ? "red"
+                  : "new"
+          }`}
+          style={{ marginTop: 4 }}
+        >
+          {t("st_" + insp.status)}
+        </span>
+      </div>
       <p className="sub">{[insp.customer, insp.address].filter(Boolean).join(" · ") || "—"}</p>
 
       {group("on", t("onQuote"))}
@@ -160,68 +175,109 @@ export function Review() {
         </div>
       )}
 
-      {/* Field close-out: signature + submit (design screen 7) */}
-      {!isOffice && !approved && (
-        <div className="card noprint">
-          <label className="f" style={{ marginTop: 0 }}>
-            {t("sig")}
-          </label>
-          <Signature value={insp.signature} onChange={(sig) => save({ ...insp, signature: sig })} />
-        </div>
-      )}
+      {/* ---- Lifecycle: signatures + status-driven actions ---- */}
+      {(() => {
+        const s = insp.status;
+        const fieldEditable = !isOffice && (s === "draft" || s === "returned");
+        const inReview = s === "submitted" || s === "under_review";
+        const isWorkOrder = s === "approved" || s === "in_progress";
+        return (
+          <>
+            {/* Field: customer signs to approve the estimate */}
+            {fieldEditable && (
+              <div className="card noprint">
+                <label className="f" style={{ marginTop: 0 }}>{t("custSignEstimate")}</label>
+                <p className="sub" style={{ marginTop: 0 }}>{t("signEstimateHint")}</p>
+                <Signature value={insp.signature} onChange={(sig) => save({ ...insp, signature: sig })} />
+              </div>
+            )}
 
-      {/* Actions */}
-      {approved ? (
-        <>
-          <div className="card noprint" style={{ textAlign: "center", background: "#e3ede8", borderColor: "#c7ddd2" }}>
-            <b style={{ color: "var(--pine)" }}>✓ {t("approved")}</b>
-          </div>
-          <button className="btn pri block noprint" onClick={() => navigate({ name: "print", inspId: insp.id })}>
-            {t("printQuote")}
-          </button>
-          {canApprove && (
-            <button className="btn block noprint" style={{ marginTop: 8 }} onClick={exportWO}>
-              {t("export")}
-            </button>
-          )}
-          {canApprove && (
+            {/* Office/admin: customer signs to confirm completed work */}
+            {isOffice && isWorkOrder && (
+              <div className="card noprint">
+                <label className="f" style={{ marginTop: 0 }}>{t("custSignComplete")}</label>
+                <p className="sub" style={{ marginTop: 0 }}>{t("signCompleteHint")}</p>
+                <Signature
+                  value={insp.completionSignature}
+                  onChange={(sig) => save({ ...insp, completionSignature: sig })}
+                />
+              </div>
+            )}
+
+            {/* Field submit for review */}
+            {fieldEditable && (
+              <button
+                className="btn pri block noprint"
+                onClick={() => {
+                  setStatus("submitted");
+                  toast(t("submitted"));
+                  navigate({ name: "home" });
+                }}
+              >
+                {t("submitForReview")}
+              </button>
+            )}
+
+            {/* Office review → approve into a work order */}
+            {isOffice && inReview && canApprove && (
+              <>
+                <button className="btn green block noprint" onClick={() => setStatus("approved")}>
+                  {t("approveCreateWO")}
+                </button>
+                <button
+                  className="btn block ghost noprint"
+                  style={{ marginTop: 8, color: "var(--text-muted)" }}
+                  onClick={() => setStatus("returned")}
+                >
+                  {t("sendBack")}
+                </button>
+              </>
+            )}
+
+            {/* Work order: start work / complete */}
+            {isOffice && s === "approved" && (
+              <button className="btn pri block noprint" onClick={() => setStatus("in_progress")}>
+                {t("startWork")}
+              </button>
+            )}
+            {isOffice && isWorkOrder && (
+              <button
+                className="btn green block noprint"
+                style={{ marginTop: 8 }}
+                onClick={() => {
+                  setStatus("completed");
+                  toast(t("jobCompleted"));
+                }}
+              >
+                {t("completeJob")}
+              </button>
+            )}
+
+            {isOffice && s === "completed" && (
+              <div
+                className="card noprint"
+                style={{ textAlign: "center", background: "var(--success-soft)", borderColor: "#c7ddd2" }}
+              >
+                <b style={{ color: "var(--success)" }}>✓ {t("jobCompleted")}</b>
+              </div>
+            )}
+
+            {/* Always available */}
             <button
               className="btn block ghost noprint"
-              style={{ marginTop: 8, color: "var(--muted)" }}
-              onClick={() => setStatus("draft")}
+              style={{ marginTop: 8 }}
+              onClick={() => navigate({ name: "print", inspId: insp.id })}
             >
-              {t("sendBack")}
+              {t("printQuote")}
             </button>
-          )}
-        </>
-      ) : (
-        <>
-          {canApprove && (
-            <button className="btn pri block noprint" onClick={() => setStatus("approved")}>
-              {t("approve")}
-            </button>
-          )}
-          {!isOffice && (
-            <button
-              className="btn pri block noprint"
-              onClick={() => {
-                setStatus("submitted");
-                toast(t("submitted"));
-                navigate({ name: "home" });
-              }}
-            >
-              {t("submit")}
-            </button>
-          )}
-          <button
-            className="btn block ghost noprint"
-            style={{ marginTop: 8 }}
-            onClick={() => navigate({ name: "print", inspId: insp.id })}
-          >
-            {t("printQuote")}
-          </button>
-        </>
-      )}
+            {canApprove && (s === "approved" || s === "in_progress" || s === "completed") && (
+              <button className="btn block noprint" style={{ marginTop: 8 }} onClick={exportWO}>
+                {t("export")}
+              </button>
+            )}
+          </>
+        );
+      })()}
 
       {sheet?.type === "lineMenu" && (
         <LineMenu

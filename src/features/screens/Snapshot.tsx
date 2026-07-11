@@ -63,7 +63,7 @@ export function Snapshot() {
             className="t"
             type="number"
             min={0}
-            max={48}
+            max={100}
             value={s.stations}
             placeholder="8"
             onChange={(e) => set({ stations: e.target.value })}

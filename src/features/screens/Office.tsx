@@ -6,14 +6,13 @@ import { useNav } from "../nav";
 import { inspectionTotals, money } from "@/lib/money/engine";
 import type { InspectionStatus } from "@/lib/data/types";
 
-type Filter = "review" | "all" | "approved";
+type Filter = "review" | "workorders" | "completed" | "all";
 
-const STATUS_LABEL: Record<InspectionStatus, string> = {
-  draft: "draft",
-  submitted: "submitted",
-  under_review: "underReview",
-  approved: "approved",
-  returned: "returned",
+const badgeTone = (s: InspectionStatus): string => {
+  if (s === "completed") return "done";
+  if (s === "approved" || s === "in_progress") return "navy";
+  if (s === "returned") return "red";
+  return "new";
 };
 
 export function Office() {
@@ -23,26 +22,59 @@ export function Office() {
   const [filter, setFilter] = useState<Filter>("review");
 
   const rows = db.inspections.filter((i) => {
-    if (filter === "all") return true;
-    if (filter === "approved") return i.status === "approved";
-    return i.status === "submitted" || i.status === "under_review" || i.status === "returned";
+    switch (filter) {
+      case "all":
+        return true;
+      case "workorders":
+        return i.status === "approved" || i.status === "in_progress";
+      case "completed":
+        return i.status === "completed";
+      default: // review
+        return i.status === "submitted" || i.status === "under_review" || i.status === "returned";
+    }
   });
+
+  const tabs: { id: Filter; label: string }[] = [
+    { id: "review", label: t("needsReview") },
+    { id: "workorders", label: t("workOrders") },
+    { id: "completed", label: t("st_completed") },
+    { id: "all", label: t("all") },
+  ];
+
+  const stat = (fn: (s: InspectionStatus) => boolean) =>
+    db.inspections.filter((i) => fn(i.status)).length;
 
   return (
     <div>
-      <h1>{t("queue")}</h1>
-      <p className="sub">{t("office")}</p>
+      <div className="statgrid">
+        <div className="statcard">
+          <div className="l">{t("needsReview")}</div>
+          <div className="v">{stat((s) => s === "submitted" || s === "under_review" || s === "returned")}</div>
+        </div>
+        <div className="statcard">
+          <div className="l">{t("workOrders")}</div>
+          <div className="v">{stat((s) => s === "approved" || s === "in_progress")}</div>
+        </div>
+        <div className="statcard">
+          <div className="l">{t("st_completed")}</div>
+          <div className="v">{stat((s) => s === "completed")}</div>
+        </div>
+        <div className="statcard">
+          <div className="l">{t("inspections")}</div>
+          <div className="v">{db.inspections.length}</div>
+        </div>
+      </div>
 
       <div className="pillbar">
-        <button className={`chip ${filter === "review" ? "on" : ""}`} onClick={() => setFilter("review")}>
-          {t("needsReview")}
-        </button>
-        <button className={`chip ${filter === "all" ? "on" : ""}`} onClick={() => setFilter("all")}>
-          {t("all")}
-        </button>
-        <button className={`chip ${filter === "approved" ? "on" : ""}`} onClick={() => setFilter("approved")}>
-          {t("approved")}
-        </button>
+        {tabs.map((tb) => (
+          <button
+            key={tb.id}
+            className={`chip ${filter === tb.id ? "on" : ""}`}
+            onClick={() => setFilter(tb.id)}
+          >
+            {tb.label}
+          </button>
+        ))}
       </div>
 
       <div className="card" style={{ overflowX: "auto", padding: 0 }}>
@@ -68,7 +100,6 @@ export function Office() {
             {rows.map((insp) => {
               const tot = inspectionTotals(insp, db.catalog);
               const issues = insp.lines.filter((l) => l.kind === "issue").length;
-              const approved = insp.status === "approved";
               return (
                 <tr
                   key={insp.id}
@@ -76,7 +107,7 @@ export function Office() {
                   onClick={() => navigate({ name: "review", inspId: insp.id })}
                 >
                   <td>
-                    <b>{insp.customer || "—"}</b>
+                    <b style={{ color: "var(--text-strong)" }}>{insp.customer || "—"}</b>
                   </td>
                   <td>{insp.address}</td>
                   <td>{insp.tech}</td>
@@ -85,7 +116,7 @@ export function Office() {
                     {money(tot.price)}
                   </td>
                   <td>
-                    <span className={`badge ${approved ? "done" : "new"}`}>{t(STATUS_LABEL[insp.status])}</span>
+                    <span className={`badge ${badgeTone(insp.status)}`}>{t("st_" + insp.status)}</span>
                   </td>
                 </tr>
               );
