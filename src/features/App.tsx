@@ -3,9 +3,10 @@ import { useEffect } from "react";
 import { StoreProvider, useStore } from "@/lib/data/store-context";
 import { I18nProvider } from "@/lib/i18n";
 import { ToastProvider } from "@/components/Toast";
+import { useIsDesktop } from "@/lib/useMediaQuery";
 import { NavProvider, useNav } from "./nav";
-import { Header } from "./Header";
 import { DeskShell } from "./DeskShell";
+import { MobileShell } from "./MobileShell";
 import { Login } from "./screens/Login";
 import { Home } from "./screens/Home";
 import { NewJob } from "./screens/NewJob";
@@ -18,6 +19,7 @@ import { Print } from "./screens/Print";
 import { Catalog } from "./screens/Catalog";
 import { Office } from "./screens/Office";
 import { Team } from "./screens/Team";
+import { Guide } from "./screens/Guide";
 
 export default function App() {
   return (
@@ -67,8 +69,11 @@ function Root() {
 
 function Shell() {
   const { user } = useStore();
+  const isDesktop = useIsDesktop();
   const isOffice = user?.role === "office" || user?.role === "admin";
-  if (isOffice) {
+  // Office/admin get the desktop operations shell on wide screens; everyone
+  // else (and everyone on phones) gets the mobile shell with bottom tabs.
+  if (isOffice && isDesktop) {
     return (
       <DeskShell>
         <Screen />
@@ -76,23 +81,17 @@ function Shell() {
     );
   }
   return (
-    <div className="app">
-      <Header />
-      <main>
-        <Screen />
-      </main>
-    </div>
+    <MobileShell>
+      <Screen />
+    </MobileShell>
   );
 }
 
 function Screen() {
   const { view } = useNav();
-  const { user } = useStore();
-  const isOffice = user?.role === "office" || user?.role === "admin";
   switch (view.name) {
     case "home":
-      // Office/admin land on the queue; field techs get the mobile home list.
-      return isOffice ? <Office /> : <Home />;
+      return <Home />;
     case "newJob":
       return <NewJob />;
     case "snapshot":
@@ -113,6 +112,8 @@ function Screen() {
       return <Office />;
     case "team":
       return <Team />;
+    case "guide":
+      return <Guide />;
     default:
       return <Home />;
   }

@@ -24,8 +24,12 @@ const DEFAULT_PERMS: Record<Role, Permissions> = {
 const slug = (s: string) =>
   s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 24) || "user";
 
+const WORDS = ["riego", "jardin", "agua", "verde", "campo", "zona", "valle", "pino"];
+const genPassword = () =>
+  `${WORDS[Math.floor(Math.random() * WORDS.length)]}-${Math.floor(1000 + Math.random() * 9000)}`;
+
 export function Team() {
-  const { db, user, saveUser, deleteUser } = useStore();
+  const { db, user, saveUser, deleteUser, loadDemo, clearDemo } = useStore();
   const { t } = useI18n();
   const toast = useToast();
 
@@ -148,14 +152,30 @@ export function Team() {
           </div>
           <div>
             <label className="f">{t("newPassword")}</label>
-            <input
-              className="t"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-            />
-            <div className="note">{isNew ? t("pwSetHint") : t("pwKeepHint")}</div>
+            <div className="row" style={{ gap: 8 }}>
+              <input
+                className="t"
+                type="text"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={isNew ? "" : "••••••••"}
+              />
+              <button type="button" className="btn sm" style={{ whiteSpace: "nowrap" }} onClick={() => setPassword(genPassword())}>
+                {t("generate")}
+              </button>
+              {password && (
+                <button
+                  type="button"
+                  className="btn sm"
+                  onClick={() => navigator.clipboard?.writeText(password).then(() => toast(t("copied")))}
+                >
+                  {t("copyPw")}
+                </button>
+              )}
+            </div>
+            <div className="note">
+              {isNew ? t("pwSetHint") : t("pwKeepHint")} {t("pwNote")}
+            </div>
           </div>
         </div>
 
@@ -199,6 +219,19 @@ export function Team() {
               </button>
             );
           })}
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ marginTop: 0 }}>{t("demoData")}</h2>
+        <p className="sub" style={{ marginTop: 0 }}>{t("demoHint")}</p>
+        <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+          <button className="btn" onClick={() => { loadDemo(); toast(t("demoLoaded")); }}>
+            {t("loadDemo")}
+          </button>
+          <button className="btn danger ghost" onClick={() => { clearDemo(); toast(t("demoCleared")); }}>
+            {t("clearDemo")}
+          </button>
         </div>
       </div>
     </div>
