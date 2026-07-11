@@ -8,13 +8,14 @@ import { HelpButton } from "./help";
 import { ThemePicker } from "./ThemePicker";
 import { Sheet } from "@/components/Sheet";
 import { newInspectionDraft } from "@/lib/data/factory";
+import { myAttention } from "@/lib/data/status";
 import {
   IconHome, IconInbox, IconGrid, IconUsers, IconPlus, IconMenu, IconGlobe,
   IconLogout, IconBook, IconBriefcase,
 } from "@/components/icons";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
+  const { user, db, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
   const { view, navigate } = useNav();
   const { t } = useI18n();
   const [more, setMore] = useState(false);
@@ -22,6 +23,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
 
   const isOffice = user.role === "office" || user.role === "admin";
   const isAdmin = !!user.permissions.editCatalog;
+  const attnCount = myAttention(db.inspections, user).length;
 
   const startNew = () => {
     const insp = newInspectionDraft(user);
@@ -48,6 +50,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
 
       <nav className="tabbar noprint">
         <button className={`tab ${homeActive ? "on" : ""}`} onClick={() => navigate({ name: "home" })}>
+          {attnCount > 0 && <span className="tabbadge">{attnCount}</span>}
           <IconHome size={22} />
           <span>{t("dashboard")}</span>
         </button>

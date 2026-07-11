@@ -211,6 +211,9 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     crewNotes: "Crew notes",
     completedWorkH: "Work completed",
     approvedRef: "Estimate approved by customer",
+    assignedTo: "Assigned to",
+    reassigned: "Reassigned",
+    workWaiting: "work waiting",
     completeJob: "Complete job",
     jobCompleted: "Job completed",
     // user / team management
@@ -523,6 +526,9 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     crewNotes: "Notas del equipo",
     completedWorkH: "Trabajo completado",
     approvedRef: "Estimado aprobado por el cliente",
+    assignedTo: "Asignado a",
+    reassigned: "Reasignado",
+    workWaiting: "trabajos pendientes",
     completeJob: "Completar trabajo",
     jobCompleted: "Trabajo completado",
     // user / team management

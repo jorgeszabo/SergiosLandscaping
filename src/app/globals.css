@@ -200,6 +200,11 @@ input.t:focus, select.t:focus, textarea.t:focus { outline: 3px solid var(--focus
 .ac-primary { font-size: 14.5px; font-weight: 600; color: var(--text-strong); }
 .ac-secondary { font-size: 12.5px; color: var(--text-muted); }
 
+/* Work-waiting count badges */
+.navbadge { margin-left: auto; background: var(--brand-accent); color: #fff; font-size: 11px; font-weight: 700; border-radius: var(--radius-pill); min-width: 19px; height: 19px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
+.tabbar .tab { position: relative; }
+.tabbadge { position: absolute; top: 3px; left: 50%; margin-left: 6px; background: var(--brand-accent); color: #fff; font-size: 10px; font-weight: 700; line-height: 1; border-radius: var(--radius-pill); min-width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+
 /* Training-mode banner */
 .trainbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--warning-soft); color: var(--text-strong); border: 1px solid var(--warning); border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 14px; font-weight: 600; font-size: 13.5px; }
 .trainbar > span { color: var(--warning); }
