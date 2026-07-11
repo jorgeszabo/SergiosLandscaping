@@ -198,7 +198,7 @@ export function Catalog() {
         .map((p) => ({ id: p.id, item: p, title: nm(p.name), meta: [p.brand, p.sku].filter(Boolean).join(" · "), right: money(p.price) }));
     if (tab === "labor")
       return draft.labor.filter((l) => match(l.name.en) || match(l.name.es))
-        .map((l) => ({ id: l.id, item: l, title: nm(l.name), meta: l.unit, right: money(l.rate) }));
+        .map((l) => ({ id: l.id, item: l, title: nm(l.name), meta: t("unit_" + l.unit), right: money(l.rate) }));
     if (tab === "assemblies")
       return draft.assemblies.filter((a) => match(a.name.en) || match(a.name.es))
         .map((a) => ({ id: a.id, item: a, title: nm(a.name), meta: a.rolled ? t("rolled") : t("itemized"), right: money(a.price) }));
@@ -327,14 +327,14 @@ function PartFields({ p, set, t }: { p: Part; set: (patch: Partial<Part>) => voi
       <div className="grid2">
         <Field label={t("unitCost")}><input className="t" type="number" value={p.cost} onChange={(e) => set({ cost: parseFloat(e.target.value || "0") })} /></Field>
         <Field label={t("sellPrice")}><input className="t" type="number" value={p.price} onChange={(e) => set({ price: parseFloat(e.target.value || "0") })} /></Field>
-        <Field label="Unit"><select className="t" value={p.unit} onChange={(e) => set({ unit: e.target.value as Unit })}>{UNITS.map((u) => <option key={u}>{u}</option>)}</select></Field>
+        <Field label={t("unitLabel")}><select className="t" value={p.unit} onChange={(e) => set({ unit: e.target.value as Unit })}>{UNITS.map((u) => <option key={u} value={u}>{t("unit_" + u)}</option>)}</select></Field>
         <Field label={t("catCategory")}>
           <input className="t" list="catlist" value={p.category || ""} onChange={(e) => set({ category: e.target.value })} />
           <datalist id="catlist">{CATEGORY_ORDER.map((c) => <option key={c} value={c} />)}</datalist>
         </Field>
-        <Field label="Brand"><input className="t" value={p.brand || ""} onChange={(e) => set({ brand: e.target.value })} /></Field>
+        <Field label={t("brandLabel")}><input className="t" value={p.brand || ""} onChange={(e) => set({ brand: e.target.value })} /></Field>
         <Field label="SKU"><input className="t" value={p.sku || ""} onChange={(e) => set({ sku: e.target.value })} /></Field>
-        <Field label="Vendor"><input className="t" value={p.vendor || ""} onChange={(e) => set({ vendor: e.target.value })} /></Field>
+        <Field label={t("vendorLabel")}><input className="t" value={p.vendor || ""} onChange={(e) => set({ vendor: e.target.value })} /></Field>
       </div>
     </>
   );
@@ -344,9 +344,9 @@ function LaborFields({ l, set, t }: { l: LaborRate; set: (patch: Partial<LaborRa
   return (
     <div className="grid2">
       <Field label={t("priceEach")}><input className="t" type="number" value={l.rate} onChange={(e) => set({ rate: parseFloat(e.target.value || "0") })} /></Field>
-      <Field label="Unit">
+      <Field label={t("unitLabel")}>
         <select className="t" value={l.unit} onChange={(e) => set({ unit: e.target.value as LaborRate["unit"] })}>
-          <option value="flat">flat</option><option value="hour">hour</option><option value="foot">foot</option>
+          <option value="flat">{t("unit_flat")}</option><option value="hour">{t("unit_hour")}</option><option value="foot">{t("unit_foot")}</option>
         </select>
       </Field>
     </div>
