@@ -25,6 +25,7 @@ export function NewJob() {
 
   const [sugs, setSugs] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
+  const [acError, setAcError] = useState("");
   const places = useRef<any>(null);
   const token = useRef<any>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,8 +40,9 @@ export function NewJob() {
         const lib = maps.importLibrary ? await maps.importLibrary("places") : maps.places;
         places.current = lib;
         if (lib?.AutocompleteSessionToken) token.current = new lib.AutocompleteSessionToken();
+        if (!lib?.AutocompleteSuggestion) setAcError("AutocompleteSuggestion not available in loaded library");
       })
-      .catch(() => {});
+      .catch((e: any) => setAcError("load: " + (e?.message || String(e))));
     return () => {
       cancelled = true;
       if (debounce.current) clearTimeout(debounce.current);
@@ -49,13 +51,19 @@ export function NewJob() {
 
   const fetchSugs = (input: string) => {
     const lib = places.current;
-    if (!lib?.AutocompleteSuggestion || input.trim().length < 3) {
+    if (input.trim().length < 3) {
       setSugs([]);
       return;
     }
-    const req: any = { input, sessionToken: token.current };
+    if (!lib?.AutocompleteSuggestion) {
+      setAcError(lib ? "AutocompleteSuggestion missing" : "Places library not loaded");
+      return;
+    }
+    const req: any = { input };
+    if (token.current) req.sessionToken = token.current;
     lib.AutocompleteSuggestion.fetchAutocompleteSuggestions(req)
       .then((res: any) => {
+        setAcError("");
         const list: Suggestion[] = (res?.suggestions || [])
           .map((s: any) => s.placePrediction)
           .filter(Boolean)
@@ -68,7 +76,10 @@ export function NewJob() {
         setSugs(list);
         setOpen(list.length > 0);
       })
-      .catch(() => setSugs([]));
+      .catch((e: any) => {
+        setSugs([]);
+        setAcError(e?.message || String(e));
+      });
   };
 
   const onAddressInput = (v: string) => {
@@ -182,6 +193,11 @@ export function NewJob() {
               onBlur={() => setTimeout(() => setOpen(false), 150)}
             />
           </div>
+          {acError && (
+            <div className="note" style={{ color: "var(--danger)", marginTop: 6 }}>
+              Maps: {acError}
+            </div>
+          )}
           {open && sugs.length > 0 && (
             <ul className="ac-drop">
               {sugs.map((s) => (
