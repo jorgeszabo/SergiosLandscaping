@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/data/store-context";
 import { useI18n } from "@/lib/i18n";
@@ -19,37 +20,64 @@ export function NewJob() {
   const [address, setAddress] = useState(insp?.address || "");
   const [city, setCity] = useState(insp?.city || "");
   const [geo, setGeo] = useState<LatLng | undefined>(insp?.geo);
-  const addrRef = useRef<HTMLInputElement>(null);
+  const acHostRef = useRef<HTMLDivElement>(null);
 
-  // Google Places address autocomplete on the address field.
+  // Google Places address autocomplete. Uses the modern PlaceAutocompleteElement
+  // (the legacy `places.Autocomplete` widget is disabled for Google Cloud
+  // projects created after March 2025). Renders Google's own input into the
+  // host div; on selection we parse the components into address/city/geo.
   useEffect(() => {
-    if (!mapsConfigured() || !addrRef.current) return;
-    let ac: { addListener: (e: string, cb: () => void) => void } | null = null;
+    if (!mapsConfigured() || !acHostRef.current) return;
+    let el: any = null;
+    let cancelled = false;
+    const host = acHostRef.current;
+
     loadMaps()
-      .then((maps) => {
-        if (!addrRef.current) return;
-        ac = new maps.places.Autocomplete(addrRef.current, {
-          types: ["address"],
-          fields: ["formatted_address", "address_components", "geometry"],
-        });
-        (ac as unknown as { addListener: (e: string, cb: () => void) => void }).addListener("place_changed", () => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const place = (ac as any).getPlace();
-          if (!place) return;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const comp = (c: string) => (place.address_components || []).find((x: any) => x.types.includes(c));
-          const streetNo = comp("street_number")?.long_name || "";
-          const route = comp("route")?.long_name || "";
-          const cityName = comp("locality")?.long_name || comp("sublocality")?.long_name || "";
-          const state = comp("administrative_area_level_1")?.short_name || "";
-          const zip = comp("postal_code")?.long_name || "";
-          setAddress([streetNo, route].filter(Boolean).join(" ") || place.formatted_address || "");
-          setCity([cityName, state, zip].filter(Boolean).join(", "));
-          const loc = place.geometry?.location;
-          if (loc) setGeo({ lat: loc.lat(), lng: loc.lng() });
-        });
+      .then(async (maps) => {
+        if (cancelled || !host) return;
+        // The new element ships in the "places" library.
+        const places = maps.importLibrary ? await maps.importLibrary("places") : maps.places;
+        const PlaceAutocompleteElement = places.PlaceAutocompleteElement || maps.places.PlaceAutocompleteElement;
+        if (!PlaceAutocompleteElement) return;
+
+        el = new PlaceAutocompleteElement();
+        el.style.width = "100%";
+        host.appendChild(el);
+
+        const onSelect = async (ev: any) => {
+          try {
+            const pred = ev?.placePrediction;
+            const place = pred?.toPlace ? pred.toPlace() : ev?.place;
+            if (!place) return;
+            await place.fetchFields({ fields: ["formattedAddress", "addressComponents", "location"] });
+            const comps: any[] = place.addressComponents || [];
+            const pick = (type: string) => comps.find((c) => (c.types || []).includes(type));
+            const streetNo = pick("street_number")?.longText || "";
+            const route = pick("route")?.longText || "";
+            const cityName =
+              pick("locality")?.longText || pick("sublocality")?.longText || pick("postal_town")?.longText || "";
+            const state = pick("administrative_area_level_1")?.shortText || "";
+            const zip = pick("postal_code")?.longText || "";
+            const streetLine = [streetNo, route].filter(Boolean).join(" ");
+            setAddress(streetLine || place.formattedAddress || "");
+            setCity([cityName, state, zip].filter(Boolean).join(", "));
+            const loc = place.location;
+            if (loc) setGeo({ lat: loc.lat(), lng: loc.lng() });
+          } catch {
+            /* ignore selection parse errors */
+          }
+        };
+
+        // Current API fires "gmp-select"; older betas used "gmp-placeselect".
+        el.addEventListener("gmp-select", onSelect);
+        el.addEventListener("gmp-placeselect", onSelect);
       })
       .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    };
   }, []);
 
   if (!insp) return null;
@@ -98,13 +126,25 @@ export function NewJob() {
         </div>
         <div>
           <label className="f">{t("address")}</label>
-          <input
-            ref={addrRef}
-            className="t"
-            value={address}
-            placeholder={mapsConfigured() ? t("searchAddress") : ""}
-            onChange={(e) => setAddress(e.target.value)}
-          />
+          {mapsConfigured() ? (
+            <>
+              {/* Google renders its own search input into this host. */}
+              <div ref={acHostRef} className="ac-host" />
+              <input
+                className="t"
+                style={{ marginTop: 8 }}
+                value={address}
+                placeholder={t("address")}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </>
+          ) : (
+            <input
+              className="t"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          )}
         </div>
         <div>
           <label className="f">{t("city")}</label>
