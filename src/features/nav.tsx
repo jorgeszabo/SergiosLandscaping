@@ -16,12 +16,14 @@ export type ViewName =
   | "office"
   | "team"
   | "customers"
+  | "customer"
   | "guide"
   | "map";
 
 export interface View {
   name: ViewName;
   inspId?: string;
+  custId?: string;
   zn?: number | "system";
   tab?: string;
 }
