@@ -31,7 +31,7 @@ export function Zones() {
       </button>
       <h1>
         {t("zonesHub")}{" "}
-        <span style={{ color: "var(--muted)", fontWeight: 400 }}>({insp.zones.length})</span>
+        <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>({insp.zones.length})</span>
       </h1>
       <p className="sub">{insp.customer || "—"}</p>
 

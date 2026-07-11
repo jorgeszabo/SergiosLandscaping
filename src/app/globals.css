@@ -13,6 +13,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Bitter";
+  src: url("/fonts/bitter.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---- Raw palette ---- */
 :root {
   --navy-50:#F0F5FA; --navy-100:#DEE8F1; --navy-200:#B8CCDF; --navy-300:#85A5C6;
@@ -48,7 +56,7 @@
   --focus-ring:var(--navy-400);
 
   /* type */
-  --font-display:Georgia,"Times New Roman",serif;
+  --font-display:"Bitter",Georgia,"Times New Roman",serif;
   --font-sans:"Work Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --weight-regular:400; --weight-medium:500; --weight-semibold:600; --weight-bold:700;
