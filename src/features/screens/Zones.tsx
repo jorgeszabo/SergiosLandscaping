@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useNav } from "../nav";
 import { useInspection } from "../useInspection";
 import { inspectionTotals, money } from "@/lib/money/engine";
+import { IconPin } from "@/components/icons";
 import type { Inspection, Zone } from "@/lib/data/types";
 
 function zoneStatus(insp: Inspection, z: Zone): { k: "new" | "issues" | "clean"; n?: number } {
@@ -81,6 +82,13 @@ export function Zones() {
 
       <button
         className="btn block"
+        onClick={() => navigate({ name: "map", inspId: insp.id })}
+      >
+        <IconPin size={16} /> {t("openSiteMap")}
+      </button>
+      <button
+        className="btn block"
+        style={{ marginTop: 8 }}
         onClick={() => navigate({ name: "addIssue", inspId: insp.id, zn: "system" })}
       >
         ＋ {t("addSysIssue")}

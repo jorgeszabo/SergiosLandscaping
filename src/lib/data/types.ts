@@ -159,6 +159,32 @@ export interface Zone {
   visited?: boolean;
 }
 
+// ── Site map (Google Maps zone drawing) ─────────────────────────────────────
+
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+/** A drawn zone-coverage outline on the aerial map. */
+export interface SitePolygon {
+  id: string;
+  zone?: number | "system";
+  path: LatLng[];
+}
+/** A dropped pin (e.g. a sprinkler head) on the aerial map. */
+export interface SitePin {
+  id: string;
+  zone?: number | "system";
+  lat: number;
+  lng: number;
+  kind?: string;
+}
+export interface SiteMap {
+  center?: LatLng;
+  polygons: SitePolygon[];
+  pins: SitePin[];
+}
+
 export type LineState = "on" | "deferred" | "declined";
 
 /** A quote line. Discriminated by `kind`. `issue` lines carry the structured
@@ -206,6 +232,10 @@ export interface Inspection {
   address: string;
   city: string;
   customerId?: string;
+  /** Geocoded location of the site (from Google address autocomplete). */
+  geo?: LatLng;
+  /** Drawn aerial site map — zone-coverage polygons and sprinkler pins. */
+  siteMap?: SiteMap;
   tech: string;
   techId?: string;
   date: string; // ISO yyyy-mm-dd
