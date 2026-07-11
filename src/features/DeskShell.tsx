@@ -14,7 +14,7 @@ import {
 /* Desktop operations shell for office/admin — sidebar + topbar, from the
    company Design System app kit. Field techs / phones use the mobile shell. */
 export function DeskShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, beginDraft } = useStore();
+  const { user, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
   const { t } = useI18n();
   const { view, navigate } = useNav();
   if (!user) return null;
@@ -70,6 +70,13 @@ export function DeskShell({ children }: { children: React.ReactNode }) {
             </button>
           ))}
         </nav>
+        <button
+          className="btn ghost sm block"
+          style={{ marginTop: 10, color: training ? "var(--warning)" : "var(--text-muted)", fontWeight: training ? 700 : 600 }}
+          onClick={() => setTraining(!training)}
+        >
+          {training ? t("exitTraining") : t("trainingMode")}
+        </button>
         <div className="whoami">
           <div className="n">{user.name}</div>
           <div className="r">{t("role_" + user.role)}</div>

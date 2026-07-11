@@ -15,7 +15,7 @@ import {
 } from "@/components/icons";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
-  const { user, lang, setLang, logout, beginDraft } = useStore();
+  const { user, lang, setLang, logout, beginDraft, training, setTraining } = useStore();
   const { view, navigate } = useNav();
   const { t } = useI18n();
   const [more, setMore] = useState(false);
@@ -106,6 +106,13 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
             </div>
             <ThemePicker />
           </div>
+          <button
+            onClick={() => { setTraining(!training); setMore(false); }}
+            style={{ color: training ? "var(--warning)" : undefined, fontWeight: training ? 700 : 600 }}
+          >
+            <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconBook size={18} /></span>
+            {training ? t("exitTraining") : t("trainingMode")}
+          </button>
           <button className="dz" onClick={() => { setMore(false); void logout(); }}>
             <span style={{ display: "inline-flex", verticalAlign: "-4px", marginRight: 10 }}><IconLogout size={18} /></span>
             {t("logout")}

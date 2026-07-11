@@ -37,6 +37,10 @@ const GUIDE = {
       p: "Admins edit parts, labor rates, assemblies, and issue types under Catalog. Parts are grouped by component type. To add a part, pick its component type — the name fills in both English and Spanish automatically, so you never translate by hand; then enter brand, model, SKU, and price. 'Load starter items' pulls in the full starter list without touching your edits. Starter prices are placeholders — replace them with your real numbers.",
     },
     {
+      h: "Training mode",
+      p: "Turn on Training mode (bottom of the sidebar, or the More menu on mobile) to practice with sample data at every lifecycle stage. A banner shows while it's on, and nothing you do touches real records — no saving to the server or device. Turn it off to return to your real data untouched. It's the safe way to onboard a new hire without mixing sample and real customers.",
+    },
+    {
       h: "Offline & sync",
       p: "The field app works with no signal — everything is saved on the device and syncs when you're back online. The pill at the top of the dashboard shows the sync state.",
     },
@@ -73,6 +77,10 @@ const GUIDE = {
     {
       h: "Catálogo",
       p: "Los admins editan piezas, mano de obra, ensambles y tipos de problema en Catálogo. Las piezas se agrupan por tipo de componente. Para agregar una pieza, elige su tipo de componente — el nombre se llena en inglés y español automáticamente, sin traducir a mano; luego captura marca, modelo, SKU y precio. “Cargar elementos iniciales” trae la lista completa sin tocar tus cambios. Los precios iniciales son de ejemplo — reemplázalos con los tuyos.",
+    },
+    {
+      h: "Modo de entrenamiento",
+      p: "Activa el Modo de entrenamiento (al final de la barra lateral, o el menú Más en el teléfono) para practicar con datos de ejemplo en cada etapa. Aparece un aviso mientras está activo y nada de lo que hagas afecta los registros reales — no se guarda en el servidor ni en el dispositivo. Desactívalo para volver a tus datos reales intactos. Es la forma segura de capacitar a alguien nuevo sin mezclar datos de ejemplo con clientes reales.",
     },
     {
       h: "Sin conexión y sincronización",

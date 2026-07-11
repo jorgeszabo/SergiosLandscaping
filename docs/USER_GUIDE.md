@@ -104,13 +104,21 @@ to open their record:
   covers a type that isn't in the list yet. **Load starter items** pulls in the
   full starter catalog without overwriting your edits. Starter prices are
   placeholders — replace them with your real numbers.
-- **Team**: add people; set role and the individual permission switches (see
-  prices, set/override prices, manage catalog, approve work orders). Set or
-  **generate a password** — you'll see the value when you set it so you can
-  share it. Passwords are stored hashed and can't be shown later; reset one here
-  any time.
-- **Demo data** (Team screen): load or clear sample customers and inspections at
-  every stage, to try things out. It's local to your device and safe to clear.
+- **Team**: *only* people & access — add people; set role and the individual
+  permission switches (see prices, set/override prices, manage catalog, approve
+  work orders). Set or **generate a password** — you'll see the value when you
+  set it so you can share it. Passwords are stored hashed and can't be shown
+  later; reset one here any time.
+
+## Training mode
+
+Turn on **Training mode** (bottom of the sidebar on desktop, or the **More**
+menu on mobile) to practice with sample data — sample customers and inspections
+at every lifecycle stage. While it's on, a banner shows across the top and
+**nothing you do touches the real records** (no saving to the server or device).
+Turn it off to return to your real data, exactly as you left it. It's the safe
+way to train a new hire or try a flow end-to-end — no loading or clearing, no
+mixing with real customers.
 
 ---
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { StoreProvider, useStore } from "@/lib/data/store-context";
-import { I18nProvider } from "@/lib/i18n";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 import { ToastProvider } from "@/components/Toast";
 import { useIsDesktop } from "@/lib/useMediaQuery";
 import { NavProvider, useNav } from "./nav";
@@ -76,6 +76,18 @@ function Root() {
   return <Shell />;
 }
 
+function TrainingBanner() {
+  const { training, setTraining } = useStore();
+  const { t } = useI18n();
+  if (!training) return null;
+  return (
+    <div className="trainbar noprint">
+      <span>● {t("trainingBanner")}</span>
+      <button className="btn sm" onClick={() => setTraining(false)}>{t("exitTraining")}</button>
+    </div>
+  );
+}
+
 function Shell() {
   const { user } = useStore();
   const isDesktop = useIsDesktop();
@@ -85,12 +97,14 @@ function Shell() {
   if (isOffice && isDesktop) {
     return (
       <DeskShell>
+        <TrainingBanner />
         <Screen />
       </DeskShell>
     );
   }
   return (
     <MobileShell>
+      <TrainingBanner />
       <Screen />
     </MobileShell>
   );
