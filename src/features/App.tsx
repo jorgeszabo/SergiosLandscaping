@@ -60,7 +60,8 @@ function Splash() {
   return (
     <div className="app">
       <main style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
-        <div style={{ fontSize: 40 }}>💧</div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Sergio's Landscaping" style={{ width: 200, height: "auto", opacity: 0.9 }} />
       </main>
     </div>
   );

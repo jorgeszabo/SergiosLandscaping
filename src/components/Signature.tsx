@@ -86,7 +86,7 @@ export function Signature({
           width: "100%",
           height: 140,
           background: "#fff",
-          border: "1px solid var(--line)",
+          border: "1px solid var(--border-subtle)",
           borderRadius: 10,
           touchAction: "none",
         }}

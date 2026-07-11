@@ -26,8 +26,9 @@ export function Print() {
       </div>
 
       <div style={{ textAlign: "center", marginBottom: 6 }}>
-        <div style={{ fontSize: 20, fontWeight: 800, color: "var(--pine)" }}>💧 Sergio&apos;s Landscaping</div>
-        <div style={{ fontSize: 12, color: "var(--muted)" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Sergio's Landscaping" style={{ width: 180, height: "auto", margin: "0 auto 4px" }} />
+        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
           Commercial &amp; Residential · Conroe, TX · 936-788-1219
         </div>
       </div>
@@ -38,8 +39,8 @@ export function Print() {
           justifyContent: "space-between",
           fontSize: 13,
           margin: "14px 0",
-          borderTop: "2px solid var(--ink)",
-          borderBottom: "1px solid var(--line)",
+          borderTop: "2px solid var(--brand-primary)",
+          borderBottom: "1px solid var(--border-subtle)",
           padding: "10px 0",
         }}
       >
@@ -57,7 +58,7 @@ export function Print() {
 
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
         <thead>
-          <tr style={{ textAlign: "left", color: "var(--muted)", fontSize: 12 }}>
+          <tr style={{ textAlign: "left", color: "var(--text-muted)", fontSize: 12 }}>
             <th style={{ padding: "6px 0" }}>{t("name")}</th>
             <th style={{ textAlign: "right" }}>{t("priceEach")}</th>
           </tr>
@@ -72,12 +73,12 @@ export function Print() {
                   : `${t("zone")} ${line.zone}`
                 : "";
             return (
-              <tr key={line.id} style={{ borderTop: "1px solid var(--line)" }}>
+              <tr key={line.id} style={{ borderTop: "1px solid var(--border-subtle)" }}>
                 <td style={{ padding: "9px 0" }}>
                   <b>{lineName(line, catalog, lang)}</b>
                   {line.count > 1 ? ` ×${line.count}` : ""}
                   <br />
-                  <span style={{ color: "var(--muted)", fontSize: 12 }}>
+                  <span style={{ color: "var(--text-muted)", fontSize: 12 }}>
                     {[z, r.detail].filter(Boolean).join(" · ")}
                   </span>
                 </td>
@@ -98,7 +99,7 @@ export function Print() {
       {defLines.length > 0 && (
         <div style={{ marginTop: 20, fontSize: 13 }}>
           <b>{t("futureNote")}</b>
-          <ul style={{ margin: "6px 0", paddingLeft: 18, color: "var(--muted)" }}>
+          <ul style={{ margin: "6px 0", paddingLeft: 18, color: "var(--text-muted)" }}>
             {defLines.map((l) => (
               <li key={l.id}>
                 {lineName(l, catalog, lang)}
@@ -109,19 +110,19 @@ export function Print() {
         </div>
       )}
 
-      <div style={{ marginTop: 30, borderTop: "1px solid var(--line)", paddingTop: 20 }}>
+      <div style={{ marginTop: 30, borderTop: "1px solid var(--border-subtle)", paddingTop: 20 }}>
         {insp.signature ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={insp.signature} alt="signature" style={{ height: 60, marginBottom: 6 }} />
         ) : (
-          <div style={{ height: 44, borderBottom: "1px solid var(--ink)", marginBottom: 6 }} />
+          <div style={{ height: 44, borderBottom: "1px solid var(--text-strong)", marginBottom: 6 }} />
         )}
-        <div style={{ fontSize: 12, color: "var(--muted)" }}>
+        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
           {t("sig")} — {t("signHint")}
         </div>
       </div>
 
-      <div style={{ textAlign: "center", marginTop: 24, fontSize: 12, color: "var(--muted)" }}>{t("thankyou")}</div>
+      <div style={{ textAlign: "center", marginTop: 24, fontSize: 12, color: "var(--text-muted)" }}>{t("thankyou")}</div>
     </div>
   );
 }

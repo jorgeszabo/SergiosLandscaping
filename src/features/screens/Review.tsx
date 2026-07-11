@@ -342,7 +342,7 @@ function LineMenu({
       <button className="dz" onClick={onRemove}>
         {t("remove")}
       </button>
-      <button style={{ color: "var(--muted)" }} onClick={onClose}>
+      <button style={{ color: "var(--text-muted)" }} onClick={onClose}>
         {t("cancel")}
       </button>
     </Sheet>
@@ -442,7 +442,7 @@ function AddLineSheet({
       <button className="btn pri block" style={{ marginTop: 14 }} onClick={add}>
         {t("addLine")}
       </button>
-      <button className="btn block ghost" style={{ marginTop: 8, color: "var(--muted)" }} onClick={onClose}>
+      <button className="btn block ghost" style={{ marginTop: 8, color: "var(--text-muted)" }} onClick={onClose}>
         {t("cancel")}
       </button>
     </Sheet>
