@@ -5,18 +5,42 @@ import { useNav } from "../nav";
 import { useInspection } from "../useInspection";
 import type { Zone } from "@/lib/data/types";
 
-const BRANDS = ["", "Hunter", "Rain Bird", "Weathermatic", "Toro", "Other"];
+const KNOWN_BRANDS = ["Hunter", "Rain Bird", "Weathermatic", "Toro"];
 const BACKFLOW = ["", "PVB", "DCV", "None"];
+// Common controller models per brand — power the Model suggestions.
+const MODELS: Record<string, string[]> = {
+  Hunter: ["X-Core", "X2", "Pro-C", "Pro-HC", "ICC2", "HPC"],
+  "Rain Bird": ["ESP-TM2", "ESP-Me3", "ESP-RZXe", "ESP-4ME", "ESP-SMTe"],
+  Weathermatic: ["SL1600", "SL4800", "SmartLine"],
+  Toro: ["TMC-212", "Evolution", "TDC"],
+};
 
 export function Snapshot() {
   const { insp, save } = useInspection();
   const { t } = useI18n();
   const { navigate, back } = useNav();
   const [s, setS] = useState(() => ({ ...insp!.snapshot }));
+  // "Other" brand mode: on when the saved brand isn't one of the known ones.
+  const [otherBrand, setOtherBrand] = useState(() => {
+    const b = insp!.snapshot.brand;
+    return !!b && b !== "" && !KNOWN_BRANDS.includes(b);
+  });
   if (!insp) return null;
 
   const stations = parseInt(s.stations || "0");
   const set = (patch: Partial<typeof s>) => setS((prev) => ({ ...prev, ...patch }));
+  const brandModels = MODELS[s.brand] || [];
+
+  const onBrand = (v: string) => {
+    if (v === "__other") {
+      setOtherBrand(true);
+      if (KNOWN_BRANDS.includes(s.brand)) set({ brand: "", model: "" });
+    } else {
+      setOtherBrand(false);
+      // Changing to a different brand clears a model that belonged to the old one.
+      set({ brand: v, model: v && !(MODELS[v] || []).includes(s.model) ? "" : s.model });
+    }
+  };
 
   const saveNext = () => {
     const n = parseInt(s.stations || "0");
@@ -43,19 +67,49 @@ export function Snapshot() {
         <div className="grid2">
           <div>
             <label className="f">{t("brand")}</label>
-            <select className="t" value={s.brand} onChange={(e) => set({ brand: e.target.value })}>
-              {BRANDS.map((b) => (
+            <select
+              className="t"
+              value={otherBrand ? "__other" : KNOWN_BRANDS.includes(s.brand) ? s.brand : ""}
+              onChange={(e) => onBrand(e.target.value)}
+            >
+              <option value="" />
+              {KNOWN_BRANDS.map((b) => (
                 <option key={b} value={b}>
                   {b}
                 </option>
               ))}
+              <option value="__other">{t("brandOther")}</option>
             </select>
           </div>
           <div>
             <label className="f">{t("model")}</label>
-            <input className="t" value={s.model} placeholder="X-Core" onChange={(e) => set({ model: e.target.value })} />
+            <input
+              className="t"
+              list="model-list"
+              value={s.model}
+              placeholder={brandModels[0] || ""}
+              onChange={(e) => set({ model: e.target.value })}
+            />
+            {brandModels.length > 0 && (
+              <datalist id="model-list">
+                {brandModels.map((m) => (
+                  <option key={m} value={m} />
+                ))}
+              </datalist>
+            )}
           </div>
         </div>
+        {otherBrand && (
+          <div>
+            <label className="f">{t("otherBrandLabel")}</label>
+            <input
+              className="t"
+              value={s.brand}
+              placeholder={t("otherBrandPh")}
+              onChange={(e) => set({ brand: e.target.value })}
+            />
+          </div>
+        )}
 
         <div>
           <label className="f">{t("stations")}</label>

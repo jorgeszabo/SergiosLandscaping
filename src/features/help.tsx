@@ -106,11 +106,13 @@ const HELP: Partial<Record<ViewName, { en: Entry; es: Entry }>> = {
       "Line items are grouped: on quote, deferred, declined.",
       "In the field, the customer signs to approve the estimate, then submit.",
       "In the office, review, approve into a work order, then complete it.",
+      "Tap any photo to view it full-screen — each is labeled with its zone and issue.",
     ]},
     es: { title: "Revisar y cotizar", steps: [
       "Las líneas se agrupan: en cotización, diferido, rechazado.",
       "En campo, el cliente firma para aprobar el estimado y se envía.",
       "En oficina, revisa, aprueba en orden de trabajo y complétala.",
+      "Toca una foto para verla en pantalla completa — cada una indica su zona y problema.",
     ]},
   },
   print: {
