@@ -54,6 +54,11 @@ steps are on your side (I can't set secrets in your Vercel account):
 4. **Redeploy** (Vercel does this automatically when you add env vars, or click
    **Redeploy**).
 
+> **Not tied to Vercel/Neon.** The app is a standard Next.js app on plain
+> PostgreSQL — it can move to a personal server (Docker or bare Node) with no
+> code changes. See **[`docs/SELF_HOSTING.md`](docs/SELF_HOSTING.md)** for the
+> full migration guide (Docker Compose, data transfer, HTTPS, backups).
+
 That's it. On the first request after the database is connected, the app
 **creates its own tables and loads the starter catalog automatically** — no
 migration step to run. Then:
@@ -156,3 +161,5 @@ seeding.
 - `docs/design-handoff.md` — the design packet
 - `docs/prototype.html` — the approved click-through prototype the UI is ported from
 - `docs/irrigation-parts-catalog-STARTER.xlsx` — the starter catalog
+- `docs/SELF_HOSTING.md` — moving off Vercel/Neon to a personal server
+- `docs/USER_GUIDE.md` — plain-language guide for the office and field crew
