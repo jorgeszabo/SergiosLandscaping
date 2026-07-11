@@ -21,9 +21,28 @@ It works **offline** in the field and syncs when back online.
 
 ## Signing in
 
-Open the app and pick your account from the dropdown, enter your password, and
-tap **Sign in**. Your language (English/Español) can be switched any time from
-the top bar. In demo mode (before a database is connected) any password works.
+Open the app, pick your account, and choose your language with the
+**Español / English** buttons on the login card — **your choice carries into the
+app**. Enter your password and tap **Sign in**. (Once inside, you can switch
+language any time from the top bar.) In demo mode — before a database is
+connected — any password works.
+
+---
+
+## Your dashboard
+
+After signing in you land on your **dashboard**. The **Needs your attention**
+list is personal to you:
+
+- **Field techs / leads** see only *their own* jobs that need action —
+  **returned** ones to rework, **drafts** to finish, and their **approved /
+  in-progress** work orders to go do.
+- **Office / admin** see what needs the office — **submitted / under review** to
+  review, then **approved** to schedule.
+
+A count **badge** on the **Dashboard** nav (sidebar on desktop, bottom tab on
+mobile) shows how many items need you — including a job just **reassigned** to
+you. When there's nothing pending it reads *You're all caught up.*
 
 ---
 
@@ -54,14 +73,18 @@ never sees dollar amounts).
 ## Office / admin — pricing and work orders
 
 1. Submitted inspections appear under **Jobs** (with counts on the dashboard).
+   Opening one marks it **under review**.
 2. Open one to land in the **quote editor**:
    - adjust line items; add part / labor / assembly / local-purchase lines,
    - stage each line as **on quote / deferred / declined**,
-   - the right side shows parts, labor, cost, **margin**, and total.
-3. **Approve → creates a work order** (the one deliberate control point).
-4. **Start work**, then **Mark complete** and capture the customer's
+   - the right side shows parts, labor, cost, **margin**, and total,
+   - captured **customer signatures show read-only with their dates**.
+3. **Reassign** the job to another tech any time with the **Assigned to**
+   selector — it moves into that person's dashboard queue.
+4. **Approve → creates a work order** (the one deliberate control point).
+5. **Start work**, then **Mark complete** and capture the customer's
    **completion signature**.
-5. **Print** the branded proposal at any stage.
+6. **Print** any of the four documents (see *Printable documents* below).
 
 Billing after a job is completed is handled by the office, outside the app.
 
