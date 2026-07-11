@@ -125,14 +125,14 @@ const HELP: Partial<Record<ViewName, { en: Entry; es: Entry }>> = {
   },
   catalog: {
     en: { title: "Catalog", steps: [
-      "Tabs for parts, labor, assemblies and issue types.",
-      "Search, then tap an item to edit its prices and names.",
-      "Prices are starter placeholders — replace with your real numbers.",
+      "Parts are grouped by component type; filter with the chips or search.",
+      "Add a part by picking its component type — the name fills in both languages, so you never translate. Then enter brand, model, SKU and price.",
+      "Use “Load starter items” to pull in the full starter list without losing your edits. Prices are placeholders — replace with your real numbers.",
     ]},
     es: { title: "Catálogo", steps: [
-      "Pestañas de piezas, mano de obra, ensambles y tipos de problema.",
-      "Busca y toca un elemento para editar sus precios y nombres.",
-      "Los precios son de ejemplo — reemplázalos con los tuyos.",
+      "Las piezas se agrupan por tipo de componente; filtra con los chips o busca.",
+      "Agrega una pieza eligiendo su tipo de componente — el nombre se llena en ambos idiomas, sin traducir. Luego captura marca, modelo, SKU y precio.",
+      "Usa “Cargar elementos iniciales” para traer la lista completa sin perder tus cambios. Los precios son de ejemplo — reemplázalos.",
     ]},
   },
   office: {

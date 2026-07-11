@@ -96,9 +96,14 @@ to open their record:
 
 ## Admin — catalog & team
 
-- **Catalog**: parts, labor rates, assemblies, and issue types. Search, tap an
-  item, edit its prices and bilingual names. Starter prices are placeholders —
-  replace them with your real numbers.
+- **Catalog**: parts, labor rates, assemblies, and issue types. Parts are
+  **grouped by component type** with a category filter. To **add a part**, pick
+  its **component type** from the list — the name fills in **both languages
+  automatically**, so you never translate by hand; then enter the brand, model,
+  SKU, and price (those are the same in any language). "Other — type it in"
+  covers a type that isn't in the list yet. **Load starter items** pulls in the
+  full starter catalog without overwriting your edits. Starter prices are
+  placeholders — replace them with your real numbers.
 - **Team**: add people; set role and the individual permission switches (see
   prices, set/override prices, manage catalog, approve work orders). Set or
   **generate a password** — you'll see the value when you set it so you can
