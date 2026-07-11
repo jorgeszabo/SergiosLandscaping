@@ -238,6 +238,14 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     removeCustomer: "Remove",
     confirmRemoveCustomer: "Remove this customer from the database?",
     customerRemoved: "Customer removed",
+    // destructive-action confirms + inspection delete
+    deleteInspection: "Delete inspection",
+    confirmDeleteInspection: "Permanently delete this inspection and its quote? This can't be undone.",
+    inspectionDeleted: "Inspection deleted",
+    confirmRemoveLine: "Remove this line from the quote?",
+    confirmClearMap: "Remove every shape and pin from the map?",
+    confirmDeleteUser: "Remove this user?",
+    confirmClearDemo: "Remove all demo data?",
     // location
     useMyLocation: "Use my location",
     locating: "Locating…",
@@ -507,6 +515,14 @@ export const STRINGS: Record<Lang, Record<string, string>> = {
     removeCustomer: "Eliminar",
     confirmRemoveCustomer: "¿Eliminar este cliente de la base de datos?",
     customerRemoved: "Cliente eliminado",
+    // destructive-action confirms + inspection delete
+    deleteInspection: "Eliminar inspección",
+    confirmDeleteInspection: "¿Eliminar de forma permanente esta inspección y su cotización? No se puede deshacer.",
+    inspectionDeleted: "Inspección eliminada",
+    confirmRemoveLine: "¿Quitar esta línea de la cotización?",
+    confirmClearMap: "¿Quitar todas las formas y pines del mapa?",
+    confirmDeleteUser: "¿Eliminar este usuario?",
+    confirmClearDemo: "¿Eliminar todos los datos de ejemplo?",
     // location
     useMyLocation: "Usar mi ubicación",
     locating: "Ubicando…",

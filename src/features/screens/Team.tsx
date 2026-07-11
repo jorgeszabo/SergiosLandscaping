@@ -85,6 +85,7 @@ export function Team() {
 
   const remove = async (u: User) => {
     if (u.id === user.id) return;
+    if (!window.confirm(t("confirmDeleteUser"))) return;
     await deleteUser(u.id);
     toast(t("userSaved"));
   };
@@ -284,7 +285,7 @@ export function Team() {
           <button className="btn" onClick={() => { loadDemo(); toast(t("demoLoaded")); }}>
             {t("loadDemo")}
           </button>
-          <button className="btn danger ghost" onClick={() => { clearDemo(); toast(t("demoCleared")); }}>
+          <button className="btn danger ghost" onClick={() => { if (window.confirm(t("confirmClearDemo"))) { clearDemo(); toast(t("demoCleared")); } }}>
             {t("clearDemo")}
           </button>
         </div>

@@ -128,6 +128,12 @@ export async function listInspections(): Promise<Inspection[]> {
   return rows.map((r) => ({ ...(r.data as Inspection), synced: true }));
 }
 
+export async function deleteInspection(id: string): Promise<void> {
+  await ensureInitialized();
+  const sql = getSql();
+  await sql`DELETE FROM inspections WHERE id = ${id}`;
+}
+
 export async function getInspection(id: string): Promise<Inspection | null> {
   await ensureInitialized();
   const sql = getSql();

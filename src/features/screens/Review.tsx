@@ -19,7 +19,7 @@ type SheetState =
 
 export function Review() {
   const { insp, save, catalog } = useInspection();
-  const { user } = useStore();
+  const { user, removeInspection } = useStore();
   const { t, nm, lang } = useI18n();
   const toast = useToast();
   const { navigate, back } = useNav();
@@ -31,7 +31,15 @@ export function Review() {
   const canEdit = user.permissions.setPrice;
   const canApprove = user.permissions.approve;
   const isOffice = user.role === "office" || user.role === "admin";
+  const isAdmin = !!user.permissions.editCatalog;
   const tot = inspectionTotals(insp, catalog);
+
+  const deleteThis = async () => {
+    if (!window.confirm(t("confirmDeleteInspection"))) return;
+    await removeInspection(insp.id);
+    toast(t("inspectionDeleted"));
+    navigate({ name: isOffice ? "office" : "home" });
+  };
 
   const setLineState = (lineId: string, state: LineState) => {
     save({ ...insp, lines: insp.lines.map((l) => (l.id === lineId ? { ...l, state } : l)) });
@@ -296,6 +304,11 @@ export function Review() {
                 {t("export")}
               </button>
             )}
+            {isAdmin && (
+              <button className="btn danger block ghost noprint" style={{ marginTop: 8 }} onClick={deleteThis}>
+                {t("deleteInspection")}
+              </button>
+            )}
           </>
         );
       })()}
@@ -339,7 +352,7 @@ function LineMenu({
       {current !== "on" && <button onClick={() => onMove("on")}>{t("moveOnQuote")}</button>}
       {current !== "deferred" && <button onClick={() => onMove("deferred")}>{t("moveDefer")}</button>}
       {current !== "declined" && <button onClick={() => onMove("declined")}>{t("moveDecline")}</button>}
-      <button className="dz" onClick={onRemove}>
+      <button className="dz" onClick={() => { if (window.confirm(t("confirmRemoveLine"))) onRemove(); }}>
         {t("remove")}
       </button>
       <button style={{ color: "var(--text-muted)" }} onClick={onClose}>

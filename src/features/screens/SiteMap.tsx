@@ -151,6 +151,7 @@ export function SiteMap() {
   }, [mode, ready]);
 
   const clearAll = () => {
+    if (g.current.shapes.length && !window.confirm(t("confirmClearMap"))) return;
     g.current.shapes.forEach((s) => s.obj.setMap(null));
     g.current.shapes = [];
     selected.current = null;

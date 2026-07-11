@@ -7,8 +7,10 @@ import type { Inspection } from "@/lib/data/types";
     persists locally and syncs to the server. */
 export function useInspection() {
   const { view } = useNav();
-  const { db, upsertInspection } = useStore();
-  const insp = db.inspections.find((i) => i.id === view.inspId) || null;
+  const { db, upsertInspection, pendingDraft } = useStore();
+  const insp =
+    db.inspections.find((i) => i.id === view.inspId) ||
+    (pendingDraft && pendingDraft.id === view.inspId ? pendingDraft : null);
   const save = (next: Inspection) => upsertInspection(next);
   return { insp, save, catalog: db.catalog };
 }
