@@ -26,7 +26,7 @@ const GUIDE = {
     },
     {
       h: "Roles & permissions",
-      p: "Field tech (capture), Office (pricing), Admin (everything, incl. the approval gate). Permissions are individual switches: see prices, set/override prices, manage catalog, and approve work orders. Manage people under Team.",
+      p: "Access is four switches you can set per person under Team: See prices, Set/override prices, Approve work orders, and Manage catalog & admin (edit the catalog, manage people, delete records). The starter roles bundle them: Field tech (none — captures and works, no prices), Lead (see prices only), Office (see + set prices, builds quotes), Admin (all four, incl. the approval gate). Office prices a job; an admin approves it — that separation is intentional, but you can grant Approve to anyone.",
     },
     {
       h: "Fixing mistakes",
@@ -68,7 +68,7 @@ const GUIDE = {
     },
     {
       h: "Roles y permisos",
-      p: "Técnico de campo (captura), Oficina (cotización), Admin (todo, incl. la aprobación). Los permisos son interruptores: ver precios, fijar/cambiar precios, administrar catálogo y aprobar órdenes. Administra personas en Equipo.",
+      p: "El acceso son cuatro interruptores que defines por persona en Equipo: Ver precios, Fijar/cambiar precios, Aprobar órdenes de trabajo, y Administrar catálogo y admin (editar el catálogo, administrar personas, eliminar registros). Los roles iniciales los combinan: Técnico de campo (ninguno — captura y trabaja, sin precios), Líder (solo ver precios), Oficina (ver + fijar precios, arma cotizaciones), Admin (los cuatro, incl. la aprobación). La oficina cotiza un trabajo; un admin lo aprueba — esa separación es intencional, pero puedes otorgar Aprobar a cualquiera.",
     },
     {
       h: "Corregir errores",

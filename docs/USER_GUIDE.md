@@ -3,6 +3,8 @@
 A plain-language guide for the office and the field crew. The same guide is
 available inside the app (**More → User guide**, or the sidebar **User guide**).
 
+> 🇲🇽 Versión en español: [`USER_GUIDE.es.md`](USER_GUIDE.es.md)
+
 ---
 
 ## What the app does
@@ -122,14 +124,38 @@ mixing with real customers.
 
 ---
 
-## Roles at a glance
+## Roles & permissions
 
-| Role | Does |
+Access is built from **four individual permissions**. A **role** is just a
+starting bundle of those permissions — you can tick any switch on or off per
+person under **Team**.
+
+### The four permissions
+
+| Permission | What it unlocks |
 | --- | --- |
-| Field tech | Captures inspections; may hold pricing permission |
-| Technical lead | Owns issue types / attributes / mappings |
-| Office | Builds and prices quotes |
-| Admin | Everything, including the approval gate and Team |
+| **See prices** | Sees dollar amounts everywhere (quote lines, totals, the proposal). Without it, the person captures and works jobs but never sees money. |
+| **Set / override prices** | Can change a line's price and add local-purchase (buy-on-the-way) lines while building a quote. Implies working with prices, so it's paired with *See prices*. |
+| **Approve work orders** | Can approve a priced inspection into a **work order** — the one deliberate gate between "quote" and "go do the work." |
+| **Manage catalog & admin** | Admin power: edit the catalog (parts, labor, assemblies, issue types), manage **Team** (add/remove people, set passwords), and **delete** records (jobs, customers). This is what makes someone an admin. |
+
+### The four starter roles
+
+| Role | See prices | Set prices | Approve | Manage/admin | In practice |
+| --- | :---: | :---: | :---: | :---: | --- |
+| **Field tech** | — | — | — | — | Captures inspections and does the work; never sees money. |
+| **Lead** | ✓ | — | — | — | Senior tech who can see prices/quotes but not change them. |
+| **Office** | ✓ | ✓ | — | — | Builds and prices quotes. Can't self-approve or delete — that's the admin gate. |
+| **Admin** | ✓ | ✓ | ✓ | ✓ | Everything: approves work orders, manages the catalog and team, cleans up records. |
+
+**Why office can't approve its own quotes:** approval is the single control point
+between pricing a job and committing to do it, so it's kept separate from
+pricing — an admin approves. If you want a specific office person to also
+approve, just turn on their **Approve work orders** switch under Team.
+
+Enforcement is real on the server, not just hidden in the screen — e.g. deleting
+a record or editing the catalog is rejected for anyone without the admin
+permission, even via the API.
 
 ---
 
