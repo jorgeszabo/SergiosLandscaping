@@ -5,17 +5,11 @@ import { useI18n } from "@/lib/i18n";
 import { useToast } from "@/components/Toast";
 import { useNav } from "../nav";
 import { inspectionTotals, money } from "@/lib/money/engine";
+import { badgeTone } from "@/lib/data/status";
 import { IconTrash } from "@/components/icons";
 import type { InspectionStatus } from "@/lib/data/types";
 
 type Filter = "review" | "workorders" | "completed" | "all";
-
-const badgeTone = (s: InspectionStatus): string => {
-  if (s === "completed") return "done";
-  if (s === "approved" || s === "in_progress") return "navy";
-  if (s === "returned") return "red";
-  return "new";
-};
 
 export function Office() {
   const { db, user, removeInspection } = useStore();

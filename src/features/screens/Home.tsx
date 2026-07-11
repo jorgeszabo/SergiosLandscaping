@@ -4,16 +4,11 @@ import { useI18n } from "@/lib/i18n";
 import { useNav } from "../nav";
 import { SyncStatus } from "@/components/SyncStatus";
 import { inspectionTotals, money } from "@/lib/money/engine";
-import { uid } from "@/lib/data/id";
-import { IconPlus, IconInbox, IconClipboard } from "@/components/icons";
+import { newInspectionDraft } from "@/lib/data/factory";
+import { badgeTone } from "@/lib/data/status";
+import { ListAvatar } from "@/components/ListAvatar";
+import { IconPlus, IconInbox } from "@/components/icons";
 import type { Inspection, InspectionStatus } from "@/lib/data/types";
-
-const badgeTone = (s: InspectionStatus): string => {
-  if (s === "completed") return "done";
-  if (s === "approved" || s === "in_progress") return "navy";
-  if (s === "returned") return "red";
-  return "new";
-};
 
 export function Home() {
   const { db, user, beginDraft } = useStore();
@@ -27,13 +22,7 @@ export function Home() {
     db.inspections.filter((i) => fn(i.status)).length;
 
   const startNew = () => {
-    const insp: Inspection = {
-      id: uid(), customer: "", address: "", city: "",
-      tech: user.name, techId: user.id,
-      date: new Date().toISOString().slice(0, 10), status: "draft",
-      snapshot: { brand: "", model: "", stations: "", backflow: "", pressure: "", rainSensor: "" },
-      zones: [], lines: [],
-    };
+    const insp = newInspectionDraft(user);
     beginDraft(insp);
     navigate({ name: "newJob", inspId: insp.id });
   };
@@ -106,15 +95,7 @@ export function Home() {
             const issues = insp.lines.filter((l) => l.kind === "issue").length;
             return (
               <button key={insp.id} className="item" onClick={() => openInsp(insp)}>
-                <span
-                  style={{
-                    width: 34, height: 34, borderRadius: 8, flex: "none",
-                    background: "var(--brand-primary-soft)", color: "var(--brand-primary)",
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  }}
-                >
-                  <IconClipboard size={18} />
-                </span>
+                <ListAvatar />
                 <div className="g">
                   <div className="n">{insp.customer || "—"}</div>
                   <div className="m">{[insp.address, insp.tech].filter(Boolean).join(" · ")} · {issues} {t("issuesWord")}</div>
