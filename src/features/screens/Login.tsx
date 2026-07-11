@@ -68,7 +68,17 @@ export function Login() {
           <label className="f" style={{ marginTop: 0 }}>
             {t("selectUser")}
           </label>
-          <select className="t" value={userId} onChange={(e) => setUserId(e.target.value)}>
+          <select
+            className="t"
+            value={userId}
+            onChange={(e) => {
+              setUserId(e.target.value);
+              // Default to the account's preferred language; the toggle below
+              // still overrides and carries into the app.
+              const u = loginUsers.find((x) => x.id === e.target.value);
+              if (u) setLang(u.lang);
+            }}
+          >
             <option value="">—</option>
             {loginUsers.map((u) => (
               <option key={u.id} value={u.id}>
